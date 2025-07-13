@@ -100,13 +100,56 @@ export class MapTestComponent {
       const data = await response.json();
       const latitude = data.latitude;
       const longitude = data.longitude;
+      const time = data.time;
 
-      console.log(`Bus ${id} → Latitude: ${latitude}, Longitude: ${longitude}`);
+      const timeDiff = Date.now() - time;
+
+      
+
+
+
+
+      console.log(`Bus ${id} → Latitude: ${latitude}, Longitude: ${longitude} , TimeStamp : ${time}` , "difference : " + timeDiff);
       this.updateMap(latitude, longitude);
     } catch (error) {
       console.error('Erreur lors de la récupération de la position:', error);
     }
   }
+
+
+
+    //Condition of Time
+    /*async afficherBus(id: number) {
+    try {
+      const response = await fetch(`http://localhost:8080/busPosition/lastPosition/${id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+      const data = await response.json();
+      const latitude = data.latitude;
+      const longitude = data.longitude;
+      const time = data.time;
+
+      const timeDiff = Date.now()-time;
+
+      if(timeDiff <= 3000){
+        console.log(`Bus ${id} → Latitude: ${latitude}, Longitude: ${longitude}`);
+        this.updateMap(latitude, longitude);
+      }
+      else {
+        console.log(`Bus ${id} → Latitude: ${latitude}, Longitude: ${longitude} , Time : ${time}`);
+      }
+      
+    } catch (error) {
+      console.error('Erreur lors de la récupération de la position:', error);
+    }
+  }*/
 
 
   
