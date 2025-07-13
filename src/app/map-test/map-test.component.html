@@ -1,1 +1,17 @@
-<p>map-test works!</p>
+<div style="padding: 10px; margin-bottom: 10px;">
+  <label for="busId">ID Bus :</label>
+  <input id="busId" type="number" [(ngModel)]="idBus" min="1" style="width: 100px; margin-right: 10px;" />
+  <button (click)="afficherBus(idBus)" style="padding: 6px 12px;">Afficher Bus</button>
+</div>
+
+<div style="padding: 10px;">
+  <label>Départ :</label>
+  <input [(ngModel)]="depart" placeholder="ex: 35.8256,10.6084" />
+  <label>Destination :</label>
+  <input [(ngModel)]="destination" placeholder="ex: 36.8065,10.1815" />
+  <button (click)="calculateRoute()">Tracer</button>
+</div>
+
+<div id="map" style="height: 600px;"></div>
+
+
