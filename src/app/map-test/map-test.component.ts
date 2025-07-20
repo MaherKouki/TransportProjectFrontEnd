@@ -85,7 +85,7 @@ export class MapTestComponent {
     }, 1000);
   }
 
-  async afficherBus(id: number) {
+  /*async afficherBus(id: number) {
     try {
       const response = await fetch(`http://localhost:8080/busPosition/lastPosition/${id}`, {
         method: 'GET',
@@ -104,22 +104,18 @@ export class MapTestComponent {
 
       const timeDiff = Date.now() - time;
 
-      
-
-
-
 
       console.log(`Bus ${id} → Latitude: ${latitude}, Longitude: ${longitude} , TimeStamp : ${time}` , "difference : " + timeDiff);
       this.updateMap(latitude, longitude);
     } catch (error) {
       console.error('Erreur lors de la récupération de la position:', error);
     }
-  }
+  }*/
 
 
 
     //Condition of Time
-    /*async afficherBus(id: number) {
+    async afficherBus(id: number) {
     try {
       const response = await fetch(`http://localhost:8080/busPosition/lastPosition/${id}`, {
         method: 'GET',
@@ -140,20 +136,21 @@ export class MapTestComponent {
 
       if(timeDiff <= 3000){
         console.log(`Bus ${id} → Latitude: ${latitude}, Longitude: ${longitude}`);
-        this.updateMap(latitude, longitude);
+        this.updateMap(latitude, longitude , true);
       }
       else {
         console.log(`Bus ${id} → Latitude: ${latitude}, Longitude: ${longitude} , Time : ${time}`);
+        this.updateMap(latitude, longitude , false);
       }
       
     } catch (error) {
       console.error('Erreur lors de la récupération de la position:', error);
     }
-  }*/
+  }
 
 
   
-  updateMap(latitude: number, longitude: number): void {
+  /*updateMap(latitude: number, longitude: number): void {
     const busIcon = L.icon({
       iconUrl: '/bus6.jpg',
       iconSize: [40, 40],
@@ -169,7 +166,42 @@ export class MapTestComponent {
     }
 
     this.map.setView(position, 15);
+  }*/
+
+
+
+
+
+
+    updateMap(latitude: number, longitude: number, live: boolean): void {
+  const iconUrl = live ? '/bus6.jpg' : '/bus.png';
+
+  const busIcon = L.icon({
+    iconUrl,
+    iconSize: [40, 40],
+    iconAnchor: [20, 40]
+  });
+
+  const position = L.latLng(latitude, longitude);
+
+  if (this.marker) {
+    this.marker.setLatLng(position);
+    this.marker.setIcon(busIcon);
+    if (!live) {
+      this.marker.bindTooltip("Signal perdu").openTooltip();
+    } else {
+      this.marker.unbindTooltip(); // Remove tooltip if live again
+    }
+  } else {
+    this.marker = L.marker(position, { icon: busIcon }).addTo(this.map);
+    if (!live) {
+      this.marker.bindTooltip(" Signal perdu").openTooltip();
+    }
   }
+
+  this.map.setView(position, 13);
+}
+
 }
 
 
