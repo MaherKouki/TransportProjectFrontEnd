@@ -1,3 +1,34 @@
-<p>map works!</p>
-<div id="map" style="height: 500px; width: 100%;"></div>
+<!-- <p>map-test works!</p>
+<div style="padding: 10px;">
+  <label>Vitesse :</label>
+  <input type="range" min="100" max="3000" step="100" [(ngModel)]="vitesse" />
+  <span>{{ vitesse }} ms</span>
+</div>
 
+<div id="map" style="height: 600px;"></div> -->
+
+
+
+
+
+
+<p>map-test works!</p>
+
+<div style="padding: 10px;">
+  <label>Vitesse :</label>
+  <input type="range" min="100" max="3000" step="100" [(ngModel)]="vitesse" />
+  <span>{{ vitesse }} ms</span>
+</div>
+
+<!-- ✅ Nouveau bouton -->
+<div style="margin: 10px 0;">
+  <button (click)="logPosition()">Afficher la position sélectionnée</button>
+
+  <!-- Optionnel : afficher la position sélectionnée -->
+  <div *ngIf="selectedPosition">
+    <p>Latitude : {{ selectedPosition.lat }}</p>
+    <p>Longitude : {{ selectedPosition.lng }}</p>
+  </div>
+</div>
+
+<div id="map" style="height: 600px;"></div>
