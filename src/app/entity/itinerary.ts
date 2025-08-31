@@ -13,7 +13,7 @@ export interface Itinerary {
 }
 
 
-export interface Itinerary{
+/*export interface Itinerary{
 
 
     idItinerary ?: number;
@@ -22,4 +22,4 @@ export interface Itinerary{
 
     stop ?: Stop[];
 
-}
+}*/
