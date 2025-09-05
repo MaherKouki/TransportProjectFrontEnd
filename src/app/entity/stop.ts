@@ -1,14 +1,14 @@
 import { Itinerary } from "./itinerary";
 
 export interface Stop {
-    id?: number;
+    idStop?: number;
     stopName: string;
-    laltitude: number;
+    latitude: number;
     longitude: number;
     estimatedTime : string;
-    arrivalTime: number;
+    arrivalTime?: number | null;
     orderIndex : number;
 
-    itinerary: Itinerary;
+    itinerary?: Itinerary;
 
 }

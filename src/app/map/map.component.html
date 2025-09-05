@@ -13,22 +13,308 @@
 
 
 <p>map-test works!</p>
-
+<!-- 
 <div style="padding: 10px;">
   <label>Vitesse :</label>
   <input type="range" min="100" max="3000" step="100" [(ngModel)]="vitesse" />
   <span>{{ vitesse }} ms</span>
 </div>
 
-<!-- ✅ Nouveau bouton -->
+
 <div style="margin: 10px 0;">
   <button (click)="logPosition()">Afficher la position sélectionnée</button>
 
-  <!-- Optionnel : afficher la position sélectionnée -->
+
   <div *ngIf="selectedPosition">
     <p>Latitude : {{ selectedPosition.lat }}</p>
     <p>Longitude : {{ selectedPosition.lng }}</p>
   </div>
 </div>
 
-<div id="map" style="height: 600px;"></div>
+<div id="map" style="height: 600px;"></div> -->
+
+
+
+<!-- 
+<div style="margin: 20px 0; display: flex; gap: 10px; align-items: center;">
+  <button 
+    (click)="submitItinerary()" 
+    [disabled]="selectedStops.length < 2"
+    style="padding: 10px 15px; font-weight: bold;"
+  >
+    🚌 Créer l'itinéraire
+  </button>
+
+  <button 
+    (click)="reset()"
+    style="padding: 10px 15px; background-color: #ccc;"
+  >
+    ♻️ Réinitialiser
+  </button>
+
+  <span *ngIf="selectedStops.length < 2" style="color: red; font-size: 14px;">
+    (Sélectionne au moins 2 stops)
+  </span>
+</div>
+
+<div *ngIf="selectedStops.length > 0" style="margin-bottom: 20px;">
+  <p><strong>Stops sélectionnés ({{ selectedStops.length }}) :</strong></p>
+  <ul>
+    <li *ngFor="let stop of selectedStops">
+      🧭 {{ stop.orderIndex }} - {{ stop.stopName }}
+    </li>
+  </ul>
+</div>
+
+<div id="map" style="height: 600px; border: 2px solid #ccc; border-radius: 5px;"></div> -->
+
+
+
+
+<!-- 
+<div class="map-container">
+  <div class="controls-panel">
+    <h3>Créer un Itinéraire</h3>
+    
+    <div class="selection-controls">
+      <div class="step-indicator">
+        <span class="step-text">Étape actuelle:</span>
+        <span class="step-value" [class.departure]="currentStep === 'departure'" 
+              [class.destination]="currentStep === 'destination'">
+          {{ currentStep === 'departure' ? 'Sélectionner le départ' : 'Sélectionner la destination' }}
+        </span>
+      </div>
+
+      <div class="step-buttons">
+        <button 
+          class="step-btn departure-btn" 
+          [class.active]="currentStep === 'departure'"
+          (click)="switchToDepartureSelection()">
+          📍 Définir le départ
+        </button>
+        <button 
+          class="step-btn destination-btn" 
+          [class.active]="currentStep === 'destination'"
+          (click)="switchToDestinationSelection()">
+          🎯 Définir la destination
+        </button>
+      </div>
+    </div>
+
+    <div class="selected-stops">
+      <div class="stop-info">
+        <strong>Départ:</strong>
+        <span class="stop-name">{{ departure?.stopName || 'Non sélectionné' }}</span>
+      </div>
+      <div class="stop-info">
+        <strong>Destination:</strong>
+        <span class="stop-name">{{ destination?.stopName || 'Non sélectionné' }}</span>
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <button 
+        class="submit-btn" 
+        [disabled]="!canSubmit()" 
+        (click)="submitItinerary()">
+        Créer l'itinéraire
+      </button>
+      <button class="reset-btn" (click)="reset()">
+        Réinitialiser
+      </button>
+    </div>
+
+    <div class="instructions">
+      <h4>Instructions:</h4>
+      <ol>
+        <li>Cliquez sur la carte pour sélectionner le point de départ (marqueur vert)</li>
+        <li>Cliquez ensuite pour sélectionner la destination (marqueur rouge)</li>
+        <li>Cliquez sur "Créer l'itinéraire" pour sauvegarder</li>
+      </ol>
+    </div>
+  </div>
+
+  <div id="map" class="map"></div>
+</div> -->
+
+
+
+
+
+
+<!-- <div class="map-container">
+  <div class="controls-panel">
+    <div class="header">
+      <h2>🗺️ Transport Itinerary</h2>
+      <p class="subtitle">Create your journey in a few clicks</p>
+    </div>
+    
+    <div class="step-indicator">
+      <div class="step-info">
+        <span class="step-label">Current Step:</span>
+        <div class="step-badge" [class.departure]="currentStep === 'departure'" 
+             [class.destination]="currentStep === 'destination'">
+          {{ currentStep === 'departure' ? '🚀 Select Departure' : '🎯 Select Destination' }}
+        </div>
+      </div>
+    </div>
+
+    <div class="step-buttons">
+      <button 
+        class="step-btn departure-btn" 
+        [class.active]="currentStep === 'departure'"
+        (click)="switchToDepartureSelection()">
+        🚀 Set Departure
+      </button>
+      <button 
+        class="step-btn destination-btn" 
+        [class.active]="currentStep === 'destination'"
+        (click)="switchToDestinationSelection()">
+        🎯 Set Destination
+      </button>
+    </div>
+
+    <div class="selected-stops">
+      <div class="stop-card">
+        <div class="stop-header">
+          <span class="stop-icon">🚀</span>
+          <strong>Departure Point</strong>
+        </div>
+        <div class="stop-content">
+          {{ departure?.stopName || 'Not selected' }}
+        </div>
+      </div>
+      
+      <div class="stop-card">
+        <div class="stop-header">
+          <span class="stop-icon">🎯</span>
+          <strong>Destination</strong>
+        </div>
+        <div class="stop-content">
+          {{ destination?.stopName || 'Not selected' }}
+        </div>
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <button 
+        class="submit-btn" 
+        [disabled]="!canSubmit()" 
+        (click)="submitItinerary()">
+        <span *ngIf="!isLoading">✨ Create Itinerary</span>
+        <span *ngIf="isLoading">⏳ Creating...</span>
+      </button>
+      <button class="reset-btn" (click)="reset()" [disabled]="isLoading">
+        🔄 Reset
+      </button>
+    </div>
+
+    <div class="instructions">
+      <h4>📋 Instructions:</h4>
+      <ol>
+        <li>Click on the map to select departure point (green marker)</li>
+        <li>Click again to select destination (red marker)</li>
+        <li>Click "Create Itinerary" to save</li>
+      </ol>
+    </div>
+  </div>
+
+  <div id="map" class="map"></div>
+</div> -->
+
+
+
+<div class="map-container">
+  <div class="controls-panel">
+    <div class="header">
+      <h2>🗺️ Transport Itinerary</h2>
+      <p class="subtitle">Create your journey in a few clicks</p>
+    </div>
+        
+    <div class="step-indicator">
+      <div class="step-info">
+        <span class="step-label">Current Step:</span>
+        <div class="step-badge" [class.departure]="currentStep === 'departure'"
+             [class.destination]="currentStep === 'destination'">
+          {{ currentStep === 'departure' ? '🚀 Select Departure' : '🎯 Select Destination' }}
+        </div>
+      </div>
+    </div>
+
+    <div class="step-buttons">
+      <button 
+        class="step-btn departure-btn"
+        [class.active]="currentStep === 'departure'"
+        (click)="switchToDepartureSelection()">
+        🚀 Set Departure
+      </button>
+      <button 
+        class="step-btn destination-btn"
+        [class.active]="currentStep === 'destination'"
+        (click)="switchToDestinationSelection()">
+        🎯 Set Destination
+      </button>
+    </div>
+
+    <div class="selected-stops">
+      <div class="stop-card">
+        <div class="stop-header">
+          <span class="stop-icon">🚀</span>
+          <strong>Departure Point</strong>
+        </div>
+        <div class="stop-content">
+          {{ departure?.stopName || 'Not selected' }}
+          <div *ngIf="departure" class="coordinates">
+            Lat: {{ departure.latitude | number:'1.4-4' }}, 
+            Lng: {{ departure.longitude | number:'1.4-4' }}
+          </div>
+        </div>
+      </div>
+            
+      <div class="stop-card">
+        <div class="stop-header">
+          <span class="stop-icon">🎯</span>
+          <strong>Destination</strong>
+        </div>
+        <div class="stop-content">
+          {{ destination?.stopName || 'Not selected' }}
+          <div *ngIf="destination" class="coordinates">
+            Lat: {{ destination.latitude | number:'1.4-4' }}, 
+            Lng: {{ destination.longitude | number:'1.4-4' }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <button 
+        class="submit-btn"
+        [disabled]="!canSubmit()"
+        (click)="submitItinerary()">
+        <span *ngIf="!isLoading">✨ Create Itinerary</span>
+        <span *ngIf="isLoading">⏳ Saving stops and creating itinerary...</span>
+      </button>
+      <button class="reset-btn" (click)="reset()" [disabled]="isLoading">
+        🔄 Reset
+      </button>
+    </div>
+
+    <!-- Add error display -->
+    <div *ngIf="errorMessage" class="error-message">
+      <strong>❌ Error:</strong>
+      <p>{{ errorMessage }}</p>
+      <button class="dismiss-error" (click)="clearError()">Dismiss</button>
+    </div>
+
+    <div class="instructions">
+      <h4>📋 Instructions:</h4>
+      <ol>
+        <li>Click on the map to select departure point (green marker)</li>
+        <li>Click again to select destination (red marker)</li>
+        <li>Click "Create Itinerary" to save</li>
+      </ol>
+    </div>
+  </div>
+
+  <div id="map" class="map"></div>
+</div>

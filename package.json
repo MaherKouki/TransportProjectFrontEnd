@@ -36,5 +36,16 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.7.2"
+  },
+  "vite": {
+    "server": {
+      "host": true,
+      "port": 4200,
+      "allowedHosts": [
+        "localhost",
+        "127.0.0.1",
+        "9d315def5abf.ngrok-free.app"
+      ]
+    }
   }
 }
