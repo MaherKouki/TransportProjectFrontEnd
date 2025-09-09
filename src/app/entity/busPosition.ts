@@ -14,3 +14,7 @@ export interface BusPosition {
 
   bus?: Bus;            // relation ManyToOne vers Bus (optionnelle selon API)
 }
+
+
+
+

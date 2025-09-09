@@ -1,0 +1,98 @@
+<!-- <p>bus-list works!</p> -->
+
+
+
+<div class="bus-list-container">
+  <h1>Bus Management</h1>
+  
+  <!-- Add Bus Form -->
+  <mat-card class="form-card">
+    <mat-card-header>
+      <mat-card-title>{{editingBus ? 'Edit Bus' : 'Add New Bus'}}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="busForm" (ngSubmit)="onSubmit()" class="bus-form">
+        <mat-form-field appearance="outline">
+          <mat-label>License Plate (Matricule)</mat-label>
+          <input matInput formControlName="matricule" placeholder="Enter license plate">
+          <mat-error *ngIf="busForm.get('matricule')?.hasError('required')">
+            License plate is required
+          </mat-error>
+          <mat-error *ngIf="busForm.get('matricule')?.hasError('minlength')">
+            License plate must be at least 3 characters
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Brand (Marque)</mat-label>
+          <input matInput formControlName="marque" placeholder="Enter bus brand">
+          <mat-error *ngIf="busForm.get('marque')?.hasError('required')">
+            Brand is required
+          </mat-error>
+          <mat-error *ngIf="busForm.get('marque')?.hasError('minlength')">
+            Brand must be at least 2 characters
+          </mat-error>
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button mat-raised-button color="primary" type="submit" [disabled]="!busForm.valid">
+            <mat-icon>{{editingBus ? 'edit' : 'add'}}</mat-icon>
+            {{editingBus ? 'Update Bus' : 'Add Bus'}}
+          </button>
+          <button mat-button type="button" (click)="cancelEdit()" *ngIf="editingBus">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Bus List Table -->
+  <mat-card class="table-card">
+    <mat-card-header>
+      <mat-card-title>Bus List</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner></mat-spinner>
+      </div>
+      
+      <table mat-table [dataSource]="buses" class="bus-table" *ngIf="!loading">
+        <ng-container matColumnDef="idBus">
+          <th mat-header-cell *matHeaderCellDef>ID</th>
+          <td mat-cell *matCellDef="let bus">{{bus.idBus}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="matricule">
+          <th mat-header-cell *matHeaderCellDef>License Plate</th>
+          <td mat-cell *matCellDef="let bus">{{bus.matricule}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="marque">
+          <th mat-header-cell *matHeaderCellDef>Brand</th>
+          <td mat-cell *matCellDef="let bus">{{bus.marque}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let bus">
+            <button mat-icon-button color="primary" (click)="editBus(bus)" matTooltip="Edit">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="deleteBus(bus)" matTooltip="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <div class="no-data" *ngIf="!loading && buses.length === 0">
+        <mat-icon>directions_bus</mat-icon>
+        <p>No buses found. Add your first bus above.</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

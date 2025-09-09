@@ -1,0 +1,211 @@
+<!-- <p>driver-tracking works!</p> -->
+
+
+
+
+
+
+
+
+<div class="driver-tracking-container">
+  <h1>Driver GPS Tracking</h1>
+  
+  <!-- Bus Selection -->
+  <mat-card class="selection-card">
+    <mat-card-header>
+      <mat-card-title>Select Your Bus</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="driverForm" class="selection-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Select Bus</mat-label>
+          <mat-select formControlName="busId" (selectionChange)="onBusSelect()">
+            <mat-option *ngFor="let bus of buses" [value]="bus.idBus">
+              {{bus.matricule}} - {{bus.marque}}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="driverForm.get('busId')?.hasError('required')">
+            Please select a bus
+          </mat-error>
+        </mat-form-field>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Tracking Controls -->
+  <mat-card class="controls-card" *ngIf="selectedBus">
+    <mat-card-header>
+      <mat-card-title>Tracking Controls</mat-card-title>
+      <mat-card-subtitle>Bus: {{selectedBus.matricule}} ({{selectedBus.marque}})</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="controls-section">
+        <div class="tracking-buttons">
+          <button mat-raised-button color="primary" 
+                  (click)="startTracking()" 
+                  [disabled]="isTracking">
+            <mat-icon>play_arrow</mat-icon>
+            Start GPS Tracking
+          </button>
+          <button mat-raised-button color="warn" 
+                  (click)="stopTracking()" 
+                  [disabled]="!isTracking">
+            <mat-icon>stop</mat-icon>
+            Stop Tracking
+          </button>
+          <button mat-button 
+                  (click)="sendManualPosition()" 
+                  [disabled]="isTracking">
+            <mat-icon>gps_fixed</mat-icon>
+            Send Current Position
+          </button>
+        </div>
+
+        <div class="status-section">
+          <div class="status-item">
+            <mat-icon [color]="isTracking ? 'primary' : 'warn'">
+              {{isTracking ? 'gps_fixed' : 'gps_off'}}
+            </mat-icon>
+            <span>{{isTracking ? 'Tracking Active' : 'Tracking Inactive'}}</span>
+          </div>
+          
+          <div class="status-item" *ngIf="isTracking">
+            <mat-icon color="accent">schedule</mat-icon>
+            <span>Duration: {{getTrackingDuration()}}</span>
+          </div>
+          
+          <div class="status-item" *ngIf="currentLocation">
+            <mat-icon color="primary">accuracy</mat-icon>
+            <span>{{getAccuracyStatus()}}</span>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Current Location -->
+  <mat-card class="location-card" *ngIf="currentLocation">
+    <mat-card-header>
+      <mat-card-title>Current Location</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="location-info">
+        <div class="coordinate-item">
+          <mat-icon>place</mat-icon>
+          <div>
+            <strong>Latitude:</strong> {{formatCoordinate(currentLocation.lat)}}
+          </div>
+        </div>
+        <div class="coordinate-item">
+          <mat-icon>place</mat-icon>
+          <div>
+            <strong>Longitude:</strong> {{formatCoordinate(currentLocation.lng)}}
+          </div>
+        </div>
+        <div class="coordinate-item">
+          <mat-icon>access_time</mat-icon>
+          <div>
+
+
+            <strong>Last Update:</strong>
+{{ positionHistory.length > 0 ? (positionHistory[0].timestamp | date:'mediumTime') : 'No data' }}
+
+            <!-- <strong>Last Update:</strong> {{new Date().toLocaleTimeString()}} -->
+          
+        </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Position History -->
+  <mat-card class="history-card" *ngIf="positionHistory.length > 0">
+    <mat-card-header>
+      <mat-card-title>Position History</mat-card-title>
+      <mat-card-subtitle>Last {{positionHistory.length}} positions</mat-card-subtitle>
+      <div class="header-actions">
+        <button mat-button (click)="clearHistory()">
+          <mat-icon>clear_all</mat-icon>
+          Clear History
+        </button>
+      </div>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="history-list">
+        <div *ngFor="let position of positionHistory.slice(0, 10); let i = index" 
+             class="history-item" 
+             [class.latest]="i === 0">
+          <div class="history-index">{{i + 1}}</div>
+          <div class="history-details">
+            <div class="coordinates">
+              <strong>{{formatCoordinate(position.lat)}}, {{formatCoordinate(position.lng)}}</strong>
+            </div>
+            <div class="timestamp">
+              {{position.timestamp.toLocaleTimeString()}}
+            </div>
+          </div>
+          <mat-icon *ngIf="i === 0" color="primary">fiber_manual_record</mat-icon>
+        </div>
+      </div>
+      
+      <div class="history-summary" *ngIf="positionHistory.length > 10">
+        <p>Showing latest 10 of {{positionHistory.length}} positions</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Instructions -->
+  <mat-card class="instructions-card" *ngIf="!selectedBus">
+    <mat-card-header>
+      <mat-card-title>Driver Instructions</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="instructions">
+        <div class="instruction-step">
+          <mat-icon color="primary">looks_one</mat-icon>
+          <div>
+            <h4>Select Your Bus</h4>
+            <p>Choose the bus you are currently driving from the dropdown above</p>
+          </div>
+        </div>
+        
+        <div class="instruction-step">
+          <mat-icon color="primary">looks_two</mat-icon>
+          <div>
+            <h4>Start GPS Tracking</h4>
+            <p>Click "Start GPS Tracking" to begin automatic position updates every few seconds</p>
+          </div>
+        </div>
+        
+        <div class="instruction-step">
+          <mat-icon color="primary">looks_3</mat-icon>
+          <div>
+            <h4>Monitor Your Route</h4>
+            <p>Your position will be sent to the server automatically. Passengers can track your bus in real-time</p>
+          </div>
+        </div>
+        
+        <div class="instruction-step">
+          <mat-icon color="primary">looks_4</mat-icon>
+          <div>
+            <h4>Stop When Done</h4>
+            <p>Remember to stop tracking when you finish your route or take a break</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="important-note">
+        <mat-icon color="warn">warning</mat-icon>
+        <div>
+          <h4>Important Notes:</h4>
+          <ul>
+            <li>Keep the app open and your device charged during your route</li>
+            <li>Ensure location permissions are enabled for accurate tracking</li>
+            <li>Your position data helps passengers find and track buses</li>
+            <li>Stop tracking when not actively driving to save battery</li>
+          </ul>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

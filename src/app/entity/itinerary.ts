@@ -1,3 +1,4 @@
+import { Bus } from "./bus";
 import { Stop } from "./stop";
 
 export interface Itinerary {
@@ -5,7 +6,7 @@ export interface Itinerary {
   itineraryName?: string;
   startTime?: string; // LocalTime can be represented as a string (e.g., "08:30")
 
-  stop?: Stop[];
+  stops?: Stop[];
    departure?: Stop;
    destination?: Stop;
    buses?: Bus[];

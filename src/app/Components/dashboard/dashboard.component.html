@@ -1,0 +1,73 @@
+<!-- <p>dashboard works!</p> -->
+
+
+
+
+
+
+
+
+<div class="dashboard-container">
+  <h1>Dashboard</h1>
+  
+  <div class="stats-grid" *ngIf="!loading">
+    <mat-card class="stat-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>directions_bus</mat-icon>
+          Total Buses
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-number">{{totalBuses}}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>route</mat-icon>
+          Total Itineraries
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-number">{{totalItineraries}}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>place</mat-icon>
+          Total Stops
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-number">{{totalStops}}</div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner></mat-spinner>
+    <p>Loading dashboard data...</p>
+  </div>
+
+  <div class="quick-actions" *ngIf="!loading">
+    <h2>Quick Actions</h2>
+    <div class="action-buttons">
+      <button mat-raised-button color="primary" routerLink="/buses">
+        <mat-icon>directions_bus</mat-icon>
+        Manage Buses
+      </button>
+      <button mat-raised-button color="accent" routerLink="/itinerary-form">
+        <mat-icon>add_location</mat-icon>
+        Create Itinerary
+      </button>
+      <button mat-raised-button color="warn" routerLink="/bus-tracking">
+        <mat-icon>gps_fixed</mat-icon>
+        Track Buses
+      </button>
+    </div>
+  </div>
+</div>

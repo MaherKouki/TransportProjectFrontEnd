@@ -1,1 +1,89 @@
 /* You can add global styles to this file, and also import other style files */
+
+
+/* 
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; } 
+*/
+
+
+
+
+
+
+
+/* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+/* Global Leaflet map styles */
+.leaflet-container {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+/* Custom marker icons - you'll need to add these to src/assets/ */
+.leaflet-marker-icon {
+  border-radius: 50%;
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .mat-card {
+    margin: 8px;
+  }
+
+  .mat-toolbar {
+    padding: 0 8px;
+  }
+}
+
+/* Loading spinner center utility */
+.loading-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+/* Text utilities */
+.text-center {
+  text-align: center;
+}
+
+.text-muted {
+  color: #666;
+}
+
+/* Spacing utilities */
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

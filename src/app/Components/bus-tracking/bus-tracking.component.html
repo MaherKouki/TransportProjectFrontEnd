@@ -1,0 +1,140 @@
+<!-- <p>bus-tracking works!</p> -->
+
+
+
+<div class="bus-tracking-container">
+  <h1>Real-time Bus Tracking</h1>
+  
+  <!-- Controls Section -->
+  <mat-card class="controls-card">
+    <mat-card-content>
+      <div class="controls-section">
+        <mat-form-field appearance="outline" class="itinerary-select">
+          <mat-label>Select Itinerary</mat-label>
+          <mat-select [(ngModel)]="selectedItinerary" (selectionChange)="onItinerarySelect()">
+            <mat-option *ngFor="let itinerary of itineraries" [value]="itinerary">
+              {{itinerary.itineraryName}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="tracking-controls">
+          <button mat-raised-button color="primary" 
+                  (click)="startTracking()" 
+                  [disabled]="isTracking || !selectedItinerary">
+            <mat-icon>play_arrow</mat-icon>
+            Start Tracking
+          </button>
+          <button mat-raised-button color="warn" 
+                  (click)="stopTracking()" 
+                  [disabled]="!isTracking">
+            <mat-icon>stop</mat-icon>
+            Stop Tracking
+          </button>
+        </div>
+
+        <div class="status-indicator">
+          <mat-icon [color]="isTracking ? 'primary' : 'warn'">
+            {{isTracking ? 'gps_fixed' : 'gps_off'}}
+          </mat-icon>
+          <span>{{isTracking ? 'Tracking Active' : 'Tracking Inactive'}}</span>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Map Section -->
+  <mat-card class="map-card">
+    <mat-card-header>
+      <mat-card-title>
+        {{selectedItinerary ? selectedItinerary.itineraryName : 'Select an itinerary to view map'}}
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div id="tracking-map" class="map-container"></div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Bus Information Section -->
+  <mat-card class="bus-info-card" *ngIf="selectedItinerary">
+    <mat-card-header>
+      <mat-card-title>Assigned Buses</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="buses-grid" *ngIf="getAssignedBuses().length > 0; else noBuses">
+        <mat-card *ngFor="let bus of getAssignedBuses()" class="bus-item">
+          <mat-card-content>
+            <div class="bus-header">
+              <mat-icon>directions_bus</mat-icon>
+              <div>
+                <h3>{{bus.matricule}}</h3>
+                <p>{{bus.marque}}</p>
+              </div>
+            </div>
+            
+            <div class="bus-actions">
+              <button mat-button color="primary" (click)="getBusDistance(bus)">
+                <mat-icon>straighten</mat-icon>
+                Distance to Next Stop
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      
+      <ng-template #noBuses>
+        <div class="no-buses">
+          <mat-icon>warning</mat-icon>
+          <p>No buses assigned to this itinerary</p>
+          <button mat-button color="primary" routerLink="/itineraries">
+            Assign Buses
+          </button>
+        </div>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Route Information -->
+  <mat-card class="route-info-card" *ngIf="selectedItinerary">
+    <mat-card-header>
+      <mat-card-title>Route Information</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="route-details">
+        <div class="route-point">
+          <mat-icon color="primary">place</mat-icon>
+          <div>
+            <strong>Departure:</strong> {{selectedItinerary.departure?.stopName}}
+            <br>
+            <small>{{selectedItinerary.departure?.latitude}}, {{selectedItinerary.departure?.longitude}}</small>
+          </div>
+        </div>
+
+        <div class="intermediate-stops" *ngIf="selectedItinerary.stops && selectedItinerary.stops.length > 2">
+          <h4>Intermediate Stops:</h4>
+          <div class="stops-list">
+            <div *ngFor="let stop of selectedItinerary.stops.slice(1, -1)" class="stop-item">
+              <mat-icon>location_on</mat-icon>
+              <span>{{stop.stopName}}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="route-point">
+          <mat-icon color="accent">flag</mat-icon>
+          <div>
+            <strong>Destination:</strong> {{selectedItinerary.destination?.stopName}}
+            <br>
+            <small>{{selectedItinerary.destination?.latitude}}, {{selectedItinerary.destination?.longitude}}</small>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading Indicator -->
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner></mat-spinner>
+    <p>Loading tracking data...</p>
+  </div>
+</div>
