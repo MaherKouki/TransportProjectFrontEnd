@@ -73,6 +73,22 @@ export class ItineraryService {
 
   constructor(private http: HttpClient) {}
 
+
+
+    // Create itinerary with Stop entities
+  createItineraryWithStops(departure: Stop, destination: Stop): Observable<Itinerary> {
+    const requestBody = {
+      departure: departure,
+      destination: destination
+    };
+    
+    console.log("Creating itinerary with stops:", requestBody);
+    return this.http.post<Itinerary>(`${this.baseUrl}/create`, requestBody);
+  }
+
+
+
+
   createItinerary(departure: Stop, destination: Stop): Observable<Itinerary> {
     const body = { departure, destination }
     return this.http.post<Itinerary>(`${this.baseUrl}/create`, body)

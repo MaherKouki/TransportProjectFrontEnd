@@ -1,1 +1,148 @@
-<p>itinerary-list works!</p>
+<!-- <p>itinerary-list works!</p> -->
+
+
+
+
+
+
+
+
+<div class="itinerary-list-container">
+  <h1>Itinerary Management</h1>
+  
+  <!-- Search Section -->
+  <mat-card class="search-card">
+    <mat-card-content>
+      <div class="search-section">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search Itineraries</mat-label>
+          <input matInput [(ngModel)]="searchTerm" placeholder="Search by name, departure, or destination">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+        
+        <div class="search-buttons">
+          <button mat-raised-button color="primary" routerLink="/itinerary-form">
+            <mat-icon>add</mat-icon>
+            Create New Itinerary
+          </button>
+          <button mat-button (click)="loadItineraries()">
+            <mat-icon>refresh</mat-icon>
+            Refresh
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading Spinner -->
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner></mat-spinner>
+    <p>Loading itineraries...</p>
+  </div>
+
+  <!-- Itineraries Grid -->
+  <div class="itineraries-grid" *ngIf="!loading">
+    <mat-card *ngFor="let itinerary of filteredItineraries" class="itinerary-card">
+      <mat-card-header>
+        <mat-card-title>{{itinerary.itineraryName}}</mat-card-title>
+        <mat-card-subtitle *ngIf="itinerary.startTime">
+          Start Time: {{itinerary.startTime}}
+        </mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <div class="route-info">
+          <div class="route-point">
+            <mat-icon color="primary">place</mat-icon>
+            <div>
+              <strong>From:</strong> {{itinerary.departure?.stopName}}
+              <br>
+              <small>{{itinerary.departure?.latitude}}, {{itinerary.departure?.longitude}}</small>
+            </div>
+          </div>
+          
+          <mat-icon class="route-arrow">arrow_downward</mat-icon>
+          
+          <div class="route-point">
+            <mat-icon color="accent">flag</mat-icon>
+            <div>
+              <strong>To:</strong> {{itinerary.destination?.stopName}}
+              <br>
+              <small>{{itinerary.destination?.latitude}}, {{itinerary.destination?.longitude}}</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Intermediate Stops -->
+        <div class="stops-section" *ngIf="itinerary.stops && itinerary.stops.length > 2">
+          <h4>Intermediate Stops ({{itinerary.stops.length - 2}})</h4>
+          <div class="stops-list">
+            <mat-chip-set>
+              <mat-chip *ngFor="let stop of itinerary.stops.slice(1, -1)">
+                {{stop.stopName}}
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+        </div>
+
+        <!-- Assigned Buses -->
+        <div class="buses-section">
+          <h4>Assigned Buses</h4>
+          <div class="buses-list" *ngIf="itinerary.buses && itinerary.buses.length > 0; else noBuses">
+            <mat-chip-set>
+              <mat-chip *ngFor="let bus of itinerary.buses">
+                <mat-icon matChipAvatar>directions_bus</mat-icon>
+                {{bus.matricule}} ({{bus.marque}})
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+          <ng-template #noBuses>
+            <p class="no-buses">No buses assigned</p>
+          </ng-template>
+        </div>
+
+        <!-- Bus Assignment -->
+        <div class="assign-bus-section" *ngIf="getAvailableBuses(itinerary).length > 0">
+          <mat-form-field appearance="outline">
+            <mat-label>Assign Bus</mat-label>
+            <mat-select #busSelect>
+              <mat-option *ngFor="let bus of getAvailableBuses(itinerary)" [value]="bus.idBus">
+                {{bus.matricule}} - {{bus.marque}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <button mat-raised-button color="primary" 
+                  (click)="assignBusToItinerary(itinerary.idItinerary!, busSelect.value)"
+                  [disabled]="!busSelect.value">
+            <mat-icon>add</mat-icon>
+            Assign
+          </button>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-button color="primary" routerLink="/bus-tracking" 
+                [queryParams]="{itinerary: itinerary.idItinerary}">
+          <mat-icon>gps_fixed</mat-icon>
+          Track Buses
+        </button>
+        <button mat-button>
+          <mat-icon>edit</mat-icon>
+          Edit
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- No Results -->
+  <div class="no-results" *ngIf="!loading && filteredItineraries.length === 0">
+    <mat-icon>route</mat-icon>
+    <h3>No itineraries found</h3>
+    <p *ngIf="searchTerm">Try adjusting your search terms or create a new itinerary.</p>
+    <p *ngIf="!searchTerm">No itineraries have been created yet.</p>
+    <button mat-raised-button color="primary" routerLink="/itinerary-form">
+      <mat-icon>add</mat-icon>
+      Create First Itinerary
+    </button>
+  </div>
+</div>

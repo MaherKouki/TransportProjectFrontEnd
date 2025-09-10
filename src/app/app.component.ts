@@ -59,21 +59,24 @@ import { MatToolbarModule } from "@angular/material/toolbar";
 import { MatListModule } from "@angular/material/list";
 import { MatIconModule } from "@angular/material/icon";
 import { MatButtonModule } from "@angular/material/button";
+import { CommonModule } from "@angular/common";
+//import { MapComponent } from "./map/map.component";
 
 @Component({
   selector: "app-root",
   standalone: true,   // ✅ makes this a standalone component
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.css"],
-  imports: [          // ✅ bring in Angular Material + Router
+  imports: [
     RouterOutlet,
     RouterModule,
     MatSidenavModule,
     MatToolbarModule,
     MatListModule,
     MatIconModule,
-    MatButtonModule
-  ]
+    MatButtonModule, CommonModule,
+    //MapComponent
+]
 })
 export class AppComponent {
   title = "Bus Transport Management System";
@@ -83,6 +86,8 @@ export class AppComponent {
     { name: "Buses", route: "/buses", icon: "directions_bus" },
     { name: "Stops", route: "/stops", icon: "place" },
     { name: "Itineraries", route: "/itineraries", icon: "route" },
+
+
     { name: "Create Itinerary", route: "/itinerary-form", icon: "add_location" },
     { name: "Bus Tracking", route: "/bus-tracking", icon: "gps_fixed" },
     { name: "Nearest Stop", route: "/nearest-stop", icon: "near_me" },

@@ -1,1 +1,107 @@
-<p>stop-list works!</p>
+<!-- <p>stop-list works!</p> -->
+
+
+
+
+
+
+
+
+<div class="stop-list-container">
+  <h1>Stop Management</h1>
+  
+  <div class="content-grid">
+    <!-- Map Section -->
+    <mat-card class="map-card">
+      <mat-card-header>
+        <mat-card-title>Map - Click to Select Location</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div id="map" class="map-container"></div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Form Section -->
+    <mat-card class="form-card">
+      <mat-card-header>
+        <mat-card-title>Add New Stop</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="stopForm" (ngSubmit)="onSubmit()" class="stop-form">
+          <mat-form-field appearance="outline">
+            <mat-label>Stop Name</mat-label>
+            <input matInput formControlName="stopName" placeholder="Enter stop name">
+            <mat-error *ngIf="stopForm.get('stopName')?.hasError('required')">
+              Stop name is required
+            </mat-error>
+          </mat-form-field>
+
+          <div class="coordinates-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Latitude</mat-label>
+              <input matInput formControlName="latitude" type="number" step="0.000001">
+              <mat-error *ngIf="stopForm.get('latitude')?.hasError('required')">
+                Latitude is required
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Longitude</mat-label>
+              <input matInput formControlName="longitude" type="number" step="0.000001">
+              <mat-error *ngIf="stopForm.get('longitude')?.hasError('required')">
+                Longitude is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="time-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Estimated Time</mat-label>
+              <input matInput formControlName="estimatedTime" type="time">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Arrival Time</mat-label>
+              <input matInput formControlName="arrivalTime" type="time">
+            </mat-form-field>
+          </div>
+
+          <div class="form-actions">
+            <button mat-raised-button color="primary" type="submit" [disabled]="!stopForm.valid">
+              <mat-icon>add_location</mat-icon>
+              Add Stop
+            </button>
+            <button mat-button type="button" (click)="useCurrentLocation()">
+              <mat-icon>my_location</mat-icon>
+              Use Current Location
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Stops List -->
+  <mat-card class="list-card" *ngIf="stops.length > 0">
+    <mat-card-header>
+      <mat-card-title>Existing Stops</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="stops-grid">
+        <mat-card *ngFor="let stop of stops" class="stop-item">
+          <mat-card-content>
+            <h3>{{stop.stopName}}</h3>
+            <p><strong>Coordinates:</strong> {{stop.latitude}}, {{stop.longitude}}</p>
+            <p *ngIf="stop.estimatedTime"><strong>Estimated Time:</strong> {{stop.estimatedTime}}</p>
+            <p *ngIf="stop.arrivalTime"><strong>Arrival Time:</strong> {{stop.arrivalTime}}</p>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-icon-button color="warn" (click)="deleteStop(stop)" matTooltip="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,1 +1,183 @@
-<p>nearest-stop works!</p>
+<!-- <p>nearest-stop works!</p> -->
+
+
+
+
+
+
+
+
+<div class="nearest-stop-container">
+  <h1>Find Nearest Stop</h1>
+  
+  <div class="content-layout">
+    <!-- Search Form -->
+    <mat-card class="search-card">
+      <mat-card-header>
+        <mat-card-title>Search Configuration</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="searchForm" (ngSubmit)="searchNearestStop()" class="search-form">
+          <!-- Itinerary Selection -->
+          <mat-form-field appearance="outline">
+            <mat-label>Select Itinerary</mat-label>
+            <mat-select [(ngModel)]="selectedItinerary" (selectionChange)="onItinerarySelect()" [ngModelOptions]="{standalone: true}">
+              <mat-option *ngFor="let itinerary of itineraries" [value]="itinerary">
+                {{itinerary.itineraryName}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Destination Stop Selection -->
+          <mat-form-field appearance="outline" *ngIf="selectedItinerary">
+            <mat-label>Destination Stop</mat-label>
+            <mat-select formControlName="destinationId">
+              <mat-option *ngFor="let stop of getAvailableStops()" [value]="stop.idStop">
+                {{stop.stopName}}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="searchForm.get('destinationId')?.hasError('required')">
+              Please select a destination stop
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Location Input -->
+          <div class="location-section">
+            <h3>Your Location</h3>
+            <div class="coordinates-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Latitude</mat-label>
+                <input matInput formControlName="latitude" type="number" step="0.000001">
+                <mat-error *ngIf="searchForm.get('latitude')?.hasError('required')">
+                  Latitude is required
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Longitude</mat-label>
+                <input matInput formControlName="longitude" type="number" step="0.000001">
+                <mat-error *ngIf="searchForm.get('longitude')?.hasError('required')">
+                  Longitude is required
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="location-actions">
+              <button mat-button type="button" (click)="useCurrentLocation()" [disabled]="loading">
+                <mat-icon>my_location</mat-icon>
+                Use Current Location
+              </button>
+              <small>Or click on the map to select a location</small>
+            </div>
+          </div>
+
+          <!-- Search Actions -->
+          <div class="search-actions">
+            <button mat-raised-button color="primary" type="submit" 
+                    [disabled]="!searchForm.valid || loading">
+              <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+              <mat-icon *ngIf="!loading">search</mat-icon>
+              {{loading ? 'Searching...' : 'Find Nearest Stop'}}
+            </button>
+            <button mat-button type="button" (click)="resetSearch()">
+              <mat-icon>refresh</mat-icon>
+              Reset
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Map -->
+    <mat-card class="map-card">
+      <mat-card-header>
+        <mat-card-title>Map View</mat-card-title>
+        <mat-card-subtitle>
+          {{selectedItinerary ? 'Click on map to set your location' : 'Select an itinerary to view stops'}}
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div id="nearest-stop-map" class="map-container"></div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Results Section -->
+  <mat-card class="results-card" *ngIf="searchPerformed">
+    <mat-card-header>
+      <mat-card-title>Search Results</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="results-content" *ngIf="nearestStop; else noResults">
+        <div class="result-item">
+          <mat-icon color="primary">place</mat-icon>
+          <div class="result-details">
+            <h3>{{nearestStop.stopName}}</h3>
+            <p><strong>Coordinates:</strong> {{nearestStop.latitude}}, {{nearestStop.longitude}}</p>
+            <p *ngIf="nearestStop.estimatedTime"><strong>Estimated Time:</strong> {{nearestStop.estimatedTime}}</p>
+            <p *ngIf="nearestStop.arrivalTime"><strong>Arrival Time:</strong> {{nearestStop.arrivalTime}}</p>
+          </div>
+        </div>
+
+        <div class="travel-info" *ngIf="travelTime !== null">
+          <mat-icon color="accent">directions_walk</mat-icon>
+          <div>
+            <h4>Estimated Walking Time</h4>
+            <p class="travel-time">{{travelTime}} minutes</p>
+            <small>Based on average walking speed</small>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noResults>
+        <div class="no-results">
+          <mat-icon>error_outline</mat-icon>
+          <h3>No nearest stop found</h3>
+          <p>Please check your location and destination selection.</p>
+        </div>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Instructions -->
+  <mat-card class="instructions-card" *ngIf="!searchPerformed">
+    <mat-card-header>
+      <mat-card-title>How to Use</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="instructions">
+        <div class="instruction-step">
+          <mat-icon color="primary">looks_one</mat-icon>
+          <div>
+            <h4>Select Itinerary</h4>
+            <p>Choose the bus route you want to find stops for</p>
+          </div>
+        </div>
+        
+        <div class="instruction-step">
+          <mat-icon color="primary">looks_two</mat-icon>
+          <div>
+            <h4>Choose Destination</h4>
+            <p>Select which stop on the route you want to reach</p>
+          </div>
+        </div>
+        
+        <div class="instruction-step">
+          <mat-icon color="primary">looks_3</mat-icon>
+          <div>
+            <h4>Set Your Location</h4>
+            <p>Use current location, click on map, or enter coordinates manually</p>
+          </div>
+        </div>
+        
+        <div class="instruction-step">
+          <mat-icon color="primary">looks_4</mat-icon>
+          <div>
+            <h4>Find Nearest Stop</h4>
+            <p>Click search to find the closest stop and get walking directions</p>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

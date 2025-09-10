@@ -22,7 +22,7 @@ import { BusService } from "../../service/BusService/bus.service"
 import { ItineraryService } from "../../service/ItineraryService/itinerary.service"
 import { Bus } from "../../entity/bus"
 import { Itinerary } from "../../entity/itinerary"
-import { CommonModule } from "@angular/common"
+import { CommonModule, NgFor, NgIf } from "@angular/common"
 import { FormsModule, ReactiveFormsModule } from "@angular/forms"
 import { MatCardModule } from "@angular/material/card"
 import { MatTableModule } from "@angular/material/table"
@@ -49,7 +49,10 @@ import { MatOption } from "@angular/material/autocomplete"
     MatIconModule,
     MatProgressSpinnerModule,
     MatOption,
-    FormsModule
+    FormsModule,
+        NgFor,
+    NgIf,
+ 
   ]
 })
 export class DashboardComponent implements OnInit {

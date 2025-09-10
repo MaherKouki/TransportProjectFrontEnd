@@ -1,1 +1,209 @@
-<p>itinerary-form works!</p>
+<!-- <p>itinerary-form works!</p> -->
+
+
+
+
+
+
+
+
+<div class="itinerary-form-container">
+  <h1>Create New Itinerary</h1>
+  
+  <!-- Mode Toggle -->
+  <mat-card class="mode-card">
+    <mat-card-content>
+      <div class="mode-toggle">
+<mat-slide-toggle [(ngModel)]="isMapMode" name="mapModeToggle" (change)="toggleMode()">
+  {{isMapMode ? 'Map-based Creation' : 'Form-based Creation'}}
+</mat-slide-toggle>
+        <p class="mode-description">
+          {{isMapMode ? 'Click on the map to set departure, destination, and intermediate stops' : 'Fill in the form with stop details'}}
+        </p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="content-layout">
+    <!-- Map Section (always visible) -->
+    <mat-card class="map-card">
+      <mat-card-header>
+        <mat-card-title>
+          {{isMapMode ? 'Click to Select Points' : 'Route Preview'}}
+        </mat-card-title>
+        <div class="map-actions" *ngIf="isMapMode">
+          <button mat-button (click)="clearMapSelection()">
+            <mat-icon>clear</mat-icon>
+            Clear Selection
+          </button>
+        </div>
+      </mat-card-header>
+      <mat-card-content>
+        <div id="itinerary-map" class="map-container"></div>
+        
+        <!-- Map Mode Status -->
+        <div class="map-status" *ngIf="isMapMode">
+          <div class="status-item" [class.completed]="selectedDeparture">
+            <mat-icon>{{selectedDeparture ? 'check_circle' : 'radio_button_unchecked'}}</mat-icon>
+            <span>1. Select Departure Point</span>
+          </div>
+          <div class="status-item" [class.completed]="selectedDestination">
+            <mat-icon>{{selectedDestination ? 'check_circle' : 'radio_button_unchecked'}}</mat-icon>
+            <span>2. Select Destination Point</span>
+          </div>
+          <div class="status-item" [class.completed]="intermediateStops.length > 0">
+            <mat-icon>{{intermediateStops.length > 0 ? 'check_circle' : 'radio_button_unchecked'}}</mat-icon>
+            <span>3. Add Intermediate Stops (Optional)</span>
+          </div>
+        </div>
+
+        <!-- Selected Points Summary -->
+        <div class="selected-points" *ngIf="isMapMode && (selectedDeparture || selectedDestination)">
+          <h4>Selected Points:</h4>
+          <div class="point-item" *ngIf="selectedDeparture">
+            <mat-icon color="primary">place</mat-icon>
+            <span><strong>Departure:</strong> {{selectedDeparture.latitude.toFixed(6)}}, {{selectedDeparture.longitude.toFixed(6)}}</span>
+          </div>
+          <div class="point-item" *ngIf="selectedDestination">
+            <mat-icon color="accent">flag</mat-icon>
+            <span><strong>Destination:</strong> {{selectedDestination.latitude.toFixed(6)}}, {{selectedDestination.longitude.toFixed(6)}}</span>
+          </div>
+          <div class="point-item" *ngFor="let stop of intermediateStops; let i = index">
+            <mat-icon>location_on</mat-icon>
+            <span><strong>Stop {{i + 1}}:</strong> {{stop.latitude.toFixed(6)}}, {{stop.longitude.toFixed(6)}}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Form Section (only in form mode) -->
+    <mat-card class="form-card" *ngIf="!isMapMode">
+      <mat-card-header>
+        <mat-card-title>Itinerary Details</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="itineraryForm" (ngSubmit)="onSubmit()" class="itinerary-form">
+          <!-- Departure Section -->
+          <div class="section-header">
+            <mat-icon color="primary">place</mat-icon>
+            <h3>Departure Point</h3>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Departure Stop Name</mat-label>
+              <input matInput formControlName="departureStopName" placeholder="Enter departure stop name">
+              <mat-error *ngIf="itineraryForm.get('departureStopName')?.hasError('required')">
+                Departure stop name is required
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Departure Time</mat-label>
+              <input matInput formControlName="departureTime" type="time">
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Latitude</mat-label>
+              <input matInput formControlName="departureLat" type="number" step="0.000001">
+              <mat-error *ngIf="itineraryForm.get('departureLat')?.hasError('required')">
+                Latitude is required
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Longitude</mat-label>
+              <input matInput formControlName="departureLng" type="number" step="0.000001">
+              <mat-error *ngIf="itineraryForm.get('departureLng')?.hasError('required')">
+                Longitude is required
+              </mat-error>
+            </mat-form-field>
+
+            <button mat-button type="button" (click)="useCurrentLocation('departure')">
+              <mat-icon>my_location</mat-icon>
+              Current Location
+            </button>
+          </div>
+
+          <!-- Destination Section -->
+          <div class="section-header">
+            <mat-icon color="accent">flag</mat-icon>
+            <h3>Destination Point</h3>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Destination Stop Name</mat-label>
+              <input matInput formControlName="destinationStopName" placeholder="Enter destination stop name">
+              <mat-error *ngIf="itineraryForm.get('destinationStopName')?.hasError('required')">
+                Destination stop name is required
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Arrival Time</mat-label>
+              <input matInput formControlName="destinationTime" type="time">
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Latitude</mat-label>
+              <input matInput formControlName="destinationLat" type="number" step="0.000001">
+              <mat-error *ngIf="itineraryForm.get('destinationLat')?.hasError('required')">
+                Latitude is required
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Longitude</mat-label>
+              <input matInput formControlName="destinationLng" type="number" step="0.000001">
+              <mat-error *ngIf="itineraryForm.get('destinationLng')?.hasError('required')">
+                Longitude is required
+              </mat-error>
+            </mat-form-field>
+
+            <button mat-button type="button" (click)="useCurrentLocation('destination')">
+              <mat-icon>my_location</mat-icon>
+              Current Location
+            </button>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="form-actions">
+            <button mat-raised-button color="primary" type="submit" 
+                    [disabled]="!itineraryForm.valid || loading">
+              <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+              <mat-icon *ngIf="!loading">add_location</mat-icon>
+              {{loading ? 'Creating...' : 'Create Itinerary'}}
+            </button>
+            <button mat-button type="button" routerLink="/itineraries">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Map Mode Submit -->
+    <mat-card class="submit-card" *ngIf="isMapMode">
+      <mat-card-content>
+        <div class="map-submit-section">
+          <p>Click on the map to select departure and destination points. You can also add intermediate stops.</p>
+          <button mat-raised-button color="primary" 
+                  (click)="onSubmit()" 
+                  [disabled]="!selectedDeparture || !selectedDestination || loading">
+            <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+            <mat-icon *ngIf="!loading">add_location</mat-icon>
+            {{loading ? 'Creating...' : 'Create Itinerary'}}
+          </button>
+          <button mat-button routerLink="/itineraries">
+            Cancel
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

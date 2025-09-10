@@ -1,0 +1,86 @@
+.stop-list-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.map-card {
+  height: fit-content;
+}
+
+.map-container {
+  height: 500px;
+  width: 100%;
+}
+
+.stop-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.coordinates-row,
+.time-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.form-actions button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stops-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.stop-item {
+  border-left: 4px solid #3f51b5;
+}
+
+.stop-item h3 {
+  margin: 0 0 8px 0;
+  color: #3f51b5;
+}
+
+.stop-item p {
+  margin: 4px 0;
+  font-size: 0.9em;
+}
+
+@media (max-width: 1024px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .coordinates-row,
+  .time-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .stops-grid {
+    grid-template-columns: 1fr;
+  }
+}
