@@ -1,0 +1,82 @@
+<p>add-stops-map works!</p>
+
+<div class="map-container">
+  <div class="controls-panel">
+    <div class="header">
+      <h2>📍 Add Stops to Itinerary</h2>
+      <p class="subtitle">Click on the map to add multiple stops</p>
+    </div>
+
+    <div class="step-indicator">
+      <span class="step-label">Selected Stops:</span>
+      <div class="step-badge">
+        {{selectedStops.length}} stop(s) selected
+      </div>
+    </div>
+
+    <div class="selected-stops">
+      <div *ngFor="let stop of selectedStops; let i = index" class="stop-card">
+        <div class="stop-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="stop-icon">🚩</span>
+            <strong>Stop {{i + 1}}</strong>
+          </div>
+          <button 
+            class="remove-btn"
+            (click)="removeStop(i)"
+            [disabled]="isLoading"
+            title="Remove stop">
+            ❌
+          </button>
+        </div>
+        <div class="stop-content">
+          {{stop.stopName}}
+          <div class="coordinates">
+            Lat: {{stop.latitude | number:'1.4-4'}}, Lng: {{stop.longitude | number:'1.4-4'}}
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="selectedStops.length === 0" class="no-stops">
+        <p>No stops selected yet. Click on the map to add stops.</p>
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <button 
+        class="submit-btn"
+        [disabled]="!canSubmit()"
+        (click)="submitStops()">
+        <span *ngIf="!isLoading">✨ Add {{selectedStops.length}} Stop(s)</span>
+        <span *ngIf="isLoading">⏳ Adding stops to itinerary...</span>
+      </button>
+      
+      <button 
+        class="reset-btn"
+        (click)="reset()"
+        [disabled]="isLoading">
+        🔄 Clear All
+      </button>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+      <strong>❌ Error:</strong>
+      <p>{{errorMessage}}</p>
+      <button class="dismiss-btn" (click)="dismissError()">
+        Dismiss
+      </button>
+    </div>
+
+    <div class="instructions">
+      <h4>📋 Instructions:</h4>
+      <ol>
+        <li>Click anywhere on the map to add a new stop</li>
+        <li>Each stop will be numbered and colored differently</li>
+        <li>Use the ❌ button to remove individual stops</li>
+        <li>Click "Add Stops" to save all selected stops to the itinerary</li>
+      </ol>
+    </div>
+  </div>
+
+  <div id="map" class="map"></div>
+</div>

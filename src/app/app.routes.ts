@@ -17,6 +17,7 @@ import { BusTrackingComponent } from './Components/bus-tracking/bus-tracking.com
 import { NearestStopComponent } from './Components/nearest-stop/nearest-stop.component';
 import { DriverTrackingComponent } from './Components/driver-tracking/driver-tracking.component';
 import { ItineraryMapComponent } from './Components/itinerary-map/itinerary-map.component';
+import { AddStopsMapComponent } from './Components/add-stops-map/add-stops-map.component';
 
 export const routes: Routes = [
   { path: "", redirectTo: "/dashboard", pathMatch: "full" },
@@ -26,7 +27,11 @@ export const routes: Routes = [
   { path: "itineraries", component: ItineraryListComponent },
   { path: "itinerary-form", component: ItineraryFormComponent },
 
+
   { path: "itinerary-map", component: ItineraryMapComponent },
+
+  { path: "addStopsMap", component: AddStopsMapComponent },
+
 
   { path: "bus-tracking", component: BusTrackingComponent },
   { path: "nearest-stop", component: NearestStopComponent },
