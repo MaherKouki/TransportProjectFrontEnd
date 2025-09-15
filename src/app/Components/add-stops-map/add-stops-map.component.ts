@@ -1,8 +1,8 @@
-import { Component, OnInit, Input } from "@angular/core"
-
+import { Component, OnInit } from "@angular/core"
 import * as L from "leaflet"
 import { Stop } from "../../entity/stop"
 import { ItineraryService } from "../../service/ItineraryService/itinerary.service"
+import { ActivatedRoute } from "@angular/router"
 import { FormsModule } from "@angular/forms"
 import { CommonModule } from "@angular/common"
 
@@ -14,7 +14,7 @@ import { CommonModule } from "@angular/common"
   imports: [CommonModule, FormsModule],
 })
 export class AddStopsMapComponent implements OnInit {
-  @Input() itineraryId!: number
+  itineraryId!: number
 
   private map!: L.Map
   selectedStops: Stop[] = []
@@ -23,13 +23,24 @@ export class AddStopsMapComponent implements OnInit {
   errorMessage: string | null = null
   private nextOrderIndex = 1
 
-  constructor(private itineraryService: ItineraryService) {}
+  constructor(
+    private itineraryService: ItineraryService,
+    private route: ActivatedRoute,
+  ) {}
 
   ngOnInit(): void {
-    if (!this.itineraryId) {
-      this.errorMessage = "Itinerary ID is required to add stops."
+    const idParam = this.route.snapshot.paramMap.get("id")
+    if (!idParam) {
+      this.errorMessage = "Itinerary ID is required in the URL."
       return
     }
+
+    this.itineraryId = Number(idParam)
+    if (isNaN(this.itineraryId)) {
+      this.errorMessage = "Invalid itinerary ID in the URL."
+      return
+    }
+
     this.initMap()
   }
 
@@ -49,106 +60,116 @@ export class AddStopsMapComponent implements OnInit {
     })
   }
 
-  private onMapClick(e: L.LeafletMouseEvent): void {
-    const lat = e.latlng.lat
-    const lng = e.latlng.lng
+  async onMapClick(e: L.LeafletMouseEvent): Promise<void> {
+    const { lat, lng } = e.latlng;
+    
+    try {
+      // Get the place name using reverse geocoding
+      const placeName = await this.getPlaceName(lat, lng);
+      
+      // Create a new stop with the actual place name
+      const newStop: Stop = {
+        stopName: placeName,
+        latitude: lat,
+        longitude: lng,
+        estimatedTime: null,
+        arrivalTime: null,
+        orderIndex: this.nextOrderIndex
+      };
 
-    this.getPlaceName(lat, lng).then((placeName: string) => {
-      this.addStop(lat, lng, placeName)
-    })
+      // Add the stop to the selected stops array
+      this.selectedStops.push(newStop);
+      
+      // Create a custom marker icon (similar to your itinerary component)
+      const stopIcon = L.divIcon({
+        html: `<div style="background-color: #3b82f6; width: 25px; height: 25px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold;">${this.nextOrderIndex}</div>`,
+        iconSize: [25, 25],
+        className: "custom-div-icon",
+      });
+      
+      // Create a marker for the new stop
+      const marker = L.marker([lat, lng], { icon: stopIcon })
+        .addTo(this.map)
+        .bindPopup(`<strong>📍 Stop ${this.nextOrderIndex}:</strong><br>${placeName}`)
+        .openPopup();
+      
+      // Store the marker reference
+      this.stopMarkers.push(marker);
+      
+      // Increment the order index for the next stop
+      this.nextOrderIndex++;
+      
+      console.log('New stop added:', newStop);
+    } catch (error) {
+      console.error('Error adding stop:', error);
+      this.errorMessage = "Failed to get location information. Please try again.";
+    }
   }
 
-  private addStop(lat: number, lng: number, placeName: string): void {
-    const newStop: Stop = {
-      stopName: placeName,
-      latitude: lat,
-      longitude: lng,
-      estimatedTime: "12:00:00",
-      arrivalTime: null,
-      orderIndex: this.nextOrderIndex,
+  // Add the getPlaceName method from your ItineraryMapComponent
+  async getPlaceName(lat: number, lng: number): Promise<string> {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      return data.display_name || `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
+    } catch (error) {
+      console.error("Failed to get place name:", error);
+      return `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
     }
+  }
 
-    this.selectedStops.push(newStop)
-    this.nextOrderIndex++
-
-    // Create marker with numbered icon
-    const colors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4"]
-    const colorIndex = (this.selectedStops.length - 1) % colors.length
-    const color = colors[colorIndex]
-
-    const stopIcon = L.divIcon({
-      html: `<div style="background-color: ${color}; width: 25px; height: 25px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">${this.selectedStops.length}</div>`,
-      iconSize: [25, 25],
-      className: "custom-div-icon",
-    })
-
-    const marker = L.marker([lat, lng], { icon: stopIcon })
-      .bindPopup(`<strong>🚩 Stop ${this.selectedStops.length}:</strong><br>${placeName}`)
-      .addTo(this.map)
-      .openPopup()
-
-    this.stopMarkers.push(marker)
+  reset(): void {
+    // Clear selected stops
+    this.selectedStops = [];
+    
+    // Remove all markers from the map
+    this.stopMarkers.forEach(marker => {
+      this.map.removeLayer(marker);
+    });
+    
+    // Clear marker references
+    this.stopMarkers = [];
+    
+    // Reset the order index
+    this.nextOrderIndex = 1;
+    
+    // Clear any error messages
+    this.errorMessage = null;
+    
+    console.log('Component reset successfully');
   }
 
   removeStop(index: number): void {
-    if (index >= 0 && index < this.selectedStops.length) {
-      // Remove stop from array
-      this.selectedStops.splice(index, 1)
-
-      // Remove marker from map
-      if (this.stopMarkers[index]) {
-        this.map.removeLayer(this.stopMarkers[index])
-      }
-      this.stopMarkers.splice(index, 1)
-
-      // Update order indices and marker numbers
-      this.updateStopIndices()
-      this.updateMarkerNumbers()
+    // Remove from selected stops
+    this.selectedStops.splice(index, 1);
+    
+    // Remove corresponding marker
+    if (this.stopMarkers[index]) {
+      this.map.removeLayer(this.stopMarkers[index]);
+      this.stopMarkers.splice(index, 1);
     }
+    
+    console.log(`Stop at index ${index} removed`);
   }
 
-  private updateStopIndices(): void {
-    this.selectedStops.forEach((stop, index) => {
-      stop.orderIndex = index + 1
-    })
-    this.nextOrderIndex = this.selectedStops.length + 1
+  canSubmit(): boolean {
+    return this.selectedStops.length > 0 && !this.isLoading;
   }
 
-  private updateMarkerNumbers(): void {
-    // Remove all markers and recreate them with updated numbers
-    this.stopMarkers.forEach((marker) => {
-      this.map.removeLayer(marker)
-    })
-    this.stopMarkers = []
-
-    this.selectedStops.forEach((stop, index) => {
-      const colors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4"]
-      const colorIndex = index % colors.length
-      const color = colors[colorIndex]
-
-      const stopIcon = L.divIcon({
-        html: `<div style="background-color: ${color}; width: 25px; height: 25px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">${index + 1}</div>`,
-        iconSize: [25, 25],
-        className: "custom-div-icon",
-      })
-
-      const marker = L.marker([stop.latitude, stop.longitude], { icon: stopIcon })
-        .bindPopup(`<strong>🚩 Stop ${index + 1}:</strong><br>${stop.stopName}`)
-        .addTo(this.map)
-
-      this.stopMarkers.push(marker)
-    })
+  dismissError(): void {
+    this.errorMessage = null;
   }
 
-  private async getPlaceName(lat: number, lng: number): Promise<string> {
-    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
-    try {
-      const response = await fetch(url)
-      const data = await response.json()
-      return data.display_name || `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`
-    } catch (error) {
-      console.error("Failed to get place name:", error)
-      return `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`
+  // Additional method to update stop names if needed
+  updateStopName(index: number, newName: string): void {
+    if (this.selectedStops[index]) {
+      this.selectedStops[index].stopName = newName;
+      
+      // Update the popup content for the corresponding marker
+      if (this.stopMarkers[index]) {
+        this.stopMarkers[index].setPopupContent(`<strong>📍 Stop ${index + 1}:</strong><br>${newName}`);
+      }
     }
   }
 
@@ -175,6 +196,10 @@ export class AddStopsMapComponent implements OnInit {
           errorMsg = "Invalid data provided. Please check your selections."
         } else if (err.status === 500) {
           errorMsg = "Server error occurred. Please try again later."
+        } else if (err.error && err.error.message) {
+          errorMsg = err.error.message;
+        } else if (typeof err.error === 'string') {
+          errorMsg = err.error;
         }
 
         this.errorMessage = errorMsg
@@ -184,25 +209,5 @@ export class AddStopsMapComponent implements OnInit {
         this.isLoading = false
       },
     })
-  }
-
-  reset(): void {
-    this.selectedStops = []
-    this.nextOrderIndex = 1
-    this.errorMessage = null
-
-    // Remove all markers
-    this.stopMarkers.forEach((marker) => {
-      this.map.removeLayer(marker)
-    })
-    this.stopMarkers = []
-  }
-
-  canSubmit(): boolean {
-    return this.selectedStops.length > 0 && !this.isLoading
-  }
-
-  dismissError(): void {
-    this.errorMessage = null
   }
 }

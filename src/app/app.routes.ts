@@ -30,7 +30,10 @@ export const routes: Routes = [
 
   { path: "itinerary-map", component: ItineraryMapComponent },
 
-  { path: "addStopsMap", component: AddStopsMapComponent },
+  //{ path: "addStopsMap", component: AddStopsMapComponent },
+
+  { path: 'addStopsMap/:id', component: AddStopsMapComponent },
+
 
 
   { path: "bus-tracking", component: BusTrackingComponent },

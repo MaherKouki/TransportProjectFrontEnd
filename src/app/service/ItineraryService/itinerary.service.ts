@@ -86,6 +86,14 @@ export class ItineraryService {
     return this.http.post<Itinerary>(`${this.baseUrl}/create`, requestBody);
   }
 
+  addStopsToItinerary(idItinerary: number, stops: Stop[]): Observable<void> {
+    console.log("Adding stops to itinerary:", {
+      idItinerary: idItinerary,
+      stops: stops,
+    })
+
+    return this.http.post<void>(`${this.baseUrl}/add-stops/${idItinerary}`, stops)
+  }
 
 
 
@@ -114,7 +122,7 @@ export class ItineraryService {
     return this.http.get<Itinerary[]>(`${this.baseUrl}/getAllItineraries`)
   }
 
-  addStopsToItinerary(idItinerary: number, stops: Stop[]): Observable<void> {
+  AAAAAAAAaddStopsToItinerary(idItinerary: number, stops: Stop[]): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/add-stops/${idItinerary}`, stops)
   }
 }

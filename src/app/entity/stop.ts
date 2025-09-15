@@ -5,7 +5,7 @@ export interface Stop {
     stopName: string;
     latitude: number;
     longitude: number;
-    estimatedTime : string;
+    estimatedTime : string | null;
     arrivalTime?: number | null;
     orderIndex : number;
 
