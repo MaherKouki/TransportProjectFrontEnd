@@ -18,6 +18,8 @@ import { NearestStopComponent } from './Components/nearest-stop/nearest-stop.com
 import { DriverTrackingComponent } from './Components/driver-tracking/driver-tracking.component';
 import { ItineraryMapComponent } from './Components/itinerary-map/itinerary-map.component';
 import { AddStopsMapComponent } from './Components/add-stops-map/add-stops-map.component';
+import { RouteDetailsComponent } from './Components/route-details/route-details.component';
+import { UserItineraryBrowserComponent } from './Components/user-itinerary-browser/user-itinerary-browser.component';
 
 export const routes: Routes = [
   { path: "", redirectTo: "/dashboard", pathMatch: "full" },
@@ -33,6 +35,12 @@ export const routes: Routes = [
   //{ path: "addStopsMap", component: AddStopsMapComponent },
 
   { path: 'addStopsMap/:id', component: AddStopsMapComponent },
+
+  { path: 'routeDetails', component: RouteDetailsComponent },
+
+  { path: 'userItinerary', component: UserItineraryBrowserComponent },
+
+
 
 
 

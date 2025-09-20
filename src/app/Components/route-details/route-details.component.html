@@ -1,0 +1,268 @@
+<!-- <p>route-details works!</p>
+<div class="route-details-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>{{data.itinerary.itineraryName}}</h2>
+    <button mat-icon-button (click)="onClose()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <mat-card class="route-overview-card">
+      <mat-card-content>
+        <div class="route-path">
+          <div class="route-point start">
+            <div class="point-icon">
+              <mat-icon>place</mat-icon>
+            </div>
+            <div class="point-info">
+              <h3>{{data.itinerary.departure?.stopName}}</h3>
+              <p class="coordinates">
+                {{data.itinerary.departure?.latitude}}, {{data.itinerary.departure?.longitude}}
+              </p>
+              <p class="time" *ngIf="data.itinerary.startTime">
+                Departure: {{data.itinerary.startTime}}
+              </p>
+            </div>
+          </div>
+
+          <div class="route-line" *ngIf="getIntermediateStops().length > 0">
+            <div class="line"></div>
+            <div class="intermediate-stops">
+              <div class="intermediate-stop" *ngFor="let stop of getIntermediateStops()">
+                <div class="stop-dot"></div>
+                <div class="stop-name">{{stop.stopName}}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="route-point end">
+            <div class="point-icon">
+              <mat-icon>flag</mat-icon>
+            </div>
+            <div class="point-info">
+              <h3>{{data.itinerary.destination?.stopName}}</h3>
+              <p class="coordinates">
+                {{data.itinerary.destination?.latitude}}, {{data.itinerary.destination?.longitude}}
+              </p>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-divider></mat-divider>
+
+    <mat-card class="bus-info-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>directions_bus</mat-icon>
+          Available Buses
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="buses-list" *ngIf="data.itinerary.buses && data.itinerary.buses.length > 0; else noBuses">
+          <div class="bus-item" *ngFor="let bus of data.itinerary.buses">
+            <div class="bus-icon">
+              <mat-icon>directions_bus</mat-icon>
+            </div>
+            <div class="bus-details">
+              <h4>{{bus.matricule}}</h4>
+              <p>{{bus.marque}}</p>
+            </div>
+          </div>
+        </div>
+        <ng-template #noBuses>
+          <div class="no-buses">
+            <mat-icon>info</mat-icon>
+            <p>No buses currently assigned to this route</p>
+          </div>
+        </ng-template>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stops-list-card" *ngIf="data.itinerary.stops && data.itinerary.stops.length > 0">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>list</mat-icon>
+          All Stops ({{data.itinerary.stops.length}})
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stops-timeline">
+          <div 
+            class="stop-item" 
+            *ngFor="let stop of data.itinerary.stops; let i = index"
+            [class.first]="i === 0"
+            [class.last]="i === data.itinerary.stops.length - 1">
+            <div class="stop-number">{{i + 1}}</div>
+            <div class="stop-content">
+              <h4>{{stop.stopName}}</h4>
+              <p class="stop-coordinates">{{stop.latitude}}, {{stop.longitude}}</p>
+              <p class="stop-time" *ngIf="stop.estimatedTime">
+                Estimated: {{stop.estimatedTime}}
+              </p>
+              <p class="stop-arrival" *ngIf="stop.arrivalTime">
+                Arrival: {{stop.arrivalTime}}
+              </p>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-button (click)="onClose()">Close</button>
+    <button mat-raised-button color="primary">
+      <mat-icon>gps_fixed</mat-icon>
+      Track Live
+    </button>
+  </mat-dialog-actions>
+</div> -->
+
+
+
+
+
+
+
+<div class="route-details-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title class="dialog-title">{{data.itinerary.itineraryName}}</h2>
+    <button mat-icon-button (click)="onClose()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <!-- Route Overview -->
+    <mat-card class="route-overview-card glass-effect">
+      <mat-card-content>
+        <div class="route-path">
+          <div class="route-point start">
+            <div class="point-icon start-icon">
+              <mat-icon>place</mat-icon>
+            </div>
+            <div class="point-info">
+              <h3>{{data.itinerary.departure?.stopName}}</h3>
+              <p class="coordinates">
+                {{data.itinerary.departure?.latitude}}, {{data.itinerary.departure?.longitude}}
+              </p>
+              <p class="time" *ngIf="data.itinerary.startTime">
+                <mat-icon>schedule</mat-icon>
+                Departure: {{data.itinerary.startTime}}
+              </p>
+            </div>
+          </div>
+
+          <div class="route-timeline" *ngIf="getIntermediateStops().length > 0">
+            <div class="timeline-line"></div>
+            <div class="intermediate-stops">
+              <div class="intermediate-stop" *ngFor="let stop of getIntermediateStops()">
+                <div class="stop-dot"></div>
+                <div class="stop-info">
+                  <div class="stop-name">{{stop.stopName}}</div>
+                  <div class="stop-time" *ngIf="stop.estimatedTime">{{stop.estimatedTime}}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="route-point end">
+            <div class="point-icon end-icon">
+              <mat-icon>navigation</mat-icon>
+            </div>
+            <div class="point-info">
+              <h3>{{data.itinerary.destination?.stopName}}</h3>
+              <p class="coordinates">
+                {{data.itinerary.destination?.latitude}}, {{data.itinerary.destination?.longitude}}
+              </p>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-divider class="section-divider"></mat-divider>
+
+    <!-- Bus Information -->
+    <mat-card class="bus-info-card glass-effect">
+      <mat-card-header>
+        <mat-card-title class="section-title">
+          <mat-icon>directions_bus</mat-icon>
+          Available Buses
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="buses-list" *ngIf="data.itinerary.buses && data.itinerary.buses.length > 0; else noBuses">
+          <div class="bus-item" *ngFor="let bus of data.itinerary.buses">
+            <div class="bus-icon">
+              <mat-icon>directions_bus</mat-icon>
+            </div>
+            <div class="bus-details">
+              <h4>{{bus.matricule}}</h4>
+              <p>{{bus.marque}}</p>
+            </div>
+            <div class="bus-status">
+              <mat-chip class="status-chip active">Active</mat-chip>
+            </div>
+          </div>
+        </div>
+        <ng-template #noBuses>
+          <div class="no-buses">
+            <mat-icon>info</mat-icon>
+            <p>No buses currently assigned to this route</p>
+          </div>
+        </ng-template>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- All Stops List -->
+    <mat-card class="stops-list-card glass-effect" *ngIf="data.itinerary.stops && data.itinerary.stops.length > 0">
+      <mat-card-header>
+        <mat-card-title class="section-title">
+          <mat-icon>list</mat-icon>
+          All Stops ({{data.itinerary.stops.length}})
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stops-timeline">
+          <div 
+            class="stop-item" 
+            *ngFor="let stop of data.itinerary.stops; let i = index"
+            [class.first]="i === 0"
+            [class.last]="i === data.itinerary.stops.length - 1">
+            <div class="stop-number" 
+                 [class.start]="i === 0"
+                 [class.end]="i === data.itinerary.stops.length - 1">
+              {{i + 1}}
+            </div>
+            <div class="stop-content">
+              <h4>{{stop.stopName}}</h4>
+              <p class="stop-coordinates">{{stop.latitude}}, {{stop.longitude}}</p>
+              <div class="stop-times">
+                <p class="stop-time" *ngIf="stop.estimatedTime">
+                  <mat-icon>schedule</mat-icon>
+                  Estimated: {{stop.estimatedTime}}
+                </p>
+                <p class="stop-arrival" *ngIf="stop.arrivalTime">
+                  <mat-icon>access_time</mat-icon>
+                  Arrival: {{stop.arrivalTime}}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-button (click)="onClose()" class="cancel-btn">Close</button>
+    <button mat-raised-button color="primary" class="track-btn glow-btn">
+      <mat-icon>gps_fixed</mat-icon>
+      Track Live
+    </button>
+  </mat-dialog-actions>
+</div>

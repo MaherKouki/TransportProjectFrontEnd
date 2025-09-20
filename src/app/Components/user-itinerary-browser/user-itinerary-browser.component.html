@@ -1,0 +1,389 @@
+<!-- <p>user-itinerary-browser works!</p>
+
+<div class="itinerary-browser-container"> -->
+  
+
+
+
+
+  <!-- 
+  <div class="header-section">
+    <h1 class="main-title">Find Your Route</h1>
+    <p class="subtitle">Discover bus routes and plan your journey</p>
+  </div>
+
+  <mat-card class="search-card">
+    <mat-card-content>
+      <div class="search-section">
+        <div class="search-type-buttons">
+          <button 
+            mat-button 
+            [class.active]="searchType === 'departure'"
+            (click)="setSearchType('departure')">
+            <mat-icon>place</mat-icon>
+            From
+          </button>
+          <button 
+            mat-button 
+            [class.active]="searchType === 'destination'"
+            (click)="setSearchType('destination')">
+            <mat-icon>flag</mat-icon>
+            To
+          </button>
+          <button 
+            mat-button 
+            [class.active]="searchType === 'stop'"
+            (click)="setSearchType('stop')">
+            <mat-icon>location_on</mat-icon>
+            Via
+          </button>
+        </div>
+
+        <div class="search-input-container">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>{{getSearchTypeLabel()}} where?</mat-label>
+            <input 
+              matInput 
+              [(ngModel)]="searchQuery" 
+              (input)="onSearchInput()"
+              (keyup.enter)="searchRoutes()"
+              placeholder="Enter stop name...">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+          
+          <button 
+            mat-raised-button 
+            color="primary" 
+            class="search-button"
+            (click)="searchRoutes()"
+            [disabled]="!searchQuery.trim()">
+            Search Routes
+          </button>
+
+          <button 
+            mat-icon-button 
+            class="clear-button"
+            (click)="clearSearch()"
+            *ngIf="searchQuery">
+            <mat-icon>clear</mat-icon>
+          </button>
+        </div>
+
+        <div class="suggestions-container" *ngIf="showSuggestions">
+          <div 
+            class="suggestion-item" 
+            *ngFor="let suggestion of filteredSuggestions"
+            (click)="selectSuggestion(suggestion)">
+            <mat-icon>location_on</mat-icon>
+            <span>{{suggestion.stopName}}</span>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Finding routes...</p>
+  </div>
+
+  <div class="routes-grid" *ngIf="!loading && itineraries.length > 0">
+    <mat-card 
+      *ngFor="let itinerary of itineraries" 
+      class="route-card"
+      (click)="viewRouteDetails(itinerary)">
+      
+      <mat-card-header>
+        <div class="route-number">
+          {{itinerary.itineraryName}}
+        </div>
+        <div class="route-info">
+          <mat-card-title class="route-title">
+            {{itinerary.departure?.stopName}} → {{itinerary.destination?.stopName}}
+          </mat-card-title>
+          <mat-card-subtitle *ngIf="itinerary.startTime">
+            Starts: {{itinerary.startTime}}
+          </mat-card-subtitle>
+        </div>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="route-details">
+          <div class="stop-info departure">
+            <mat-icon class="stop-icon departure-icon">place</mat-icon>
+            <div class="stop-details">
+              <strong>{{itinerary.departure?.stopName}}</strong>
+              <small *ngIf="itinerary.startTime">Departs: {{itinerary.startTime}}</small>
+            </div>
+          </div>
+
+          <div class="intermediate-stops" *ngIf="itinerary.stops && itinerary.stops.length > 2">
+            <div class="stops-indicator">
+              <mat-icon>more_horiz</mat-icon>
+              <span>{{itinerary.stops.length - 2}} stops</span>
+            </div>
+          </div>
+
+          <div class="stop-info destination">
+            <mat-icon class="stop-icon destination-icon">flag</mat-icon>
+            <div class="stop-details">
+              <strong>{{itinerary.destination?.stopName}}</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="bus-info" *ngIf="itinerary.buses && itinerary.buses.length > 0">
+          <div class="bus-count">
+            <mat-icon>directions_bus</mat-icon>
+            <span>{{itinerary.buses.length}} bus(es) available</span>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-button color="primary">
+          <mat-icon>info</mat-icon>
+          View Details
+        </button>
+        <button mat-button>
+          <mat-icon>schedule</mat-icon>
+          Times
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <div class="no-results" *ngIf="!loading && itineraries.length === 0">
+    <mat-icon class="no-results-icon">route</mat-icon>
+    <h3>No routes found</h3>
+    <p *ngIf="searchQuery">
+      We couldn't find any routes for "{{searchQuery}}". 
+      Try searching for a different location or check your spelling.
+    </p>
+    <p *ngIf="!searchQuery">
+      Start by searching for your departure point, destination, or a stop along the way.
+    </p>
+    <button mat-raised-button color="primary" (click)="clearSearch()" *ngIf="searchQuery">
+      <mat-icon>refresh</mat-icon>
+      Show All Routes
+    </button>
+  </div>
+</div> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="itinerary-browser-container">
+  <!-- Header -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="logo-section">
+        <div class="logo-icon">
+          <mat-icon>route</mat-icon>
+        </div>
+        <div class="logo-text">
+          <h1 class="main-title">TransitHub</h1>
+          <p class="subtitle">Smart Bus Transportation</p>
+        </div>
+      </div>
+      <button mat-icon-button class="refresh-btn" (click)="loadAllItineraries()">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <h2 class="hero-title">Find Your Perfect <span class="accent-text">Route</span></h2>
+    <p class="hero-subtitle">Discover bus routes, track real-time locations, and plan your journey with our intelligent transportation platform</p>
+  </div>
+
+  <!-- Search Section -->
+  <mat-card class="search-card glass-effect">
+    <mat-card-content>
+      <div class="search-section">
+        <!-- Search Type Selector -->
+        <div class="search-type-buttons">
+          <button 
+            mat-button 
+            [class.active]="searchType === 'departure'"
+            (click)="setSearchType('departure')"
+            class="search-type-btn">
+            <mat-icon>place</mat-icon>
+            From
+          </button>
+          <button 
+            mat-button 
+            [class.active]="searchType === 'destination'"
+            (click)="setSearchType('destination')"
+            class="search-type-btn">
+            <mat-icon>navigation</mat-icon>
+            To
+          </button>
+          <button 
+            mat-button 
+            [class.active]="searchType === 'stop'"
+            (click)="setSearchType('stop')"
+            class="search-type-btn">
+            <mat-icon>location_on</mat-icon>
+            Via
+          </button>
+        </div>
+
+        <!-- Search Input -->
+        <div class="search-input-container">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>{{getSearchTypeLabel()}} where?</mat-label>
+            <input 
+              matInput 
+              [(ngModel)]="searchQuery" 
+              (input)="onSearchInput()"
+              (keyup.enter)="searchRoutes()"
+              placeholder="Enter stop name...">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+          
+          <button 
+            mat-raised-button 
+            color="primary" 
+            class="search-button glow-btn"
+            (click)="searchRoutes()"
+            [disabled]="!searchQuery.trim() || loading">
+            {{loading ? 'Searching...' : 'Search Routes'}}
+          </button>
+
+          <button 
+            mat-icon-button 
+            class="clear-button"
+            (click)="clearSearch()"
+            *ngIf="searchQuery">
+            <mat-icon>clear</mat-icon>
+          </button>
+        </div>
+
+        <!-- Search Suggestions -->
+        <div class="suggestions-container glass-effect" *ngIf="showSuggestions">
+          <div 
+            class="suggestion-item" 
+            *ngFor="let suggestion of filteredSuggestions"
+            (click)="selectSuggestion(suggestion)">
+            <mat-icon>location_on</mat-icon>
+            <span>{{suggestion.stopName}}</span>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading Spinner -->
+  <div class="loading-container" *ngIf="loading">
+    <mat-card class="glass-effect loading-card">
+      <mat-card-content>
+        <mat-spinner diameter="50" class="loading-spinner"></mat-spinner>
+        <p class="loading-text">Finding the best routes for you...</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Routes Grid -->
+  <div class="routes-grid" *ngIf="!loading && itineraries.length > 0">
+    <mat-card 
+      *ngFor="let itinerary of itineraries" 
+      class="route-card glass-effect"
+      (click)="viewRouteDetails(itinerary)">
+      
+      <mat-card-header class="route-header">
+        <div class="route-badge">
+          {{itinerary.itineraryName}}
+        </div>
+        <div class="route-time" *ngIf="itinerary.startTime">
+          <mat-icon>schedule</mat-icon>
+          <span>{{itinerary.startTime}}</span>
+        </div>
+      </mat-card-header>
+
+      <mat-card-content class="route-content">
+        <div class="route-path">
+          <!-- Departure -->
+          <div class="route-point departure">
+            <div class="point-icon departure-icon">
+              <mat-icon>place</mat-icon>
+            </div>
+            <div class="point-details">
+              <h4>{{itinerary.departure?.stopName}}</h4>
+              <small *ngIf="itinerary.startTime">Departs: {{itinerary.startTime}}</small>
+            </div>
+          </div>
+
+          <!-- Intermediate Stops -->
+          <div class="route-connector" *ngIf="itinerary.stops && itinerary.stops.length > 2">
+            <div class="connector-line"></div>
+            <div class="stops-indicator">
+              <mat-icon>more_horiz</mat-icon>
+              <span>{{itinerary.stops.length - 2}} stops</span>
+            </div>
+          </div>
+
+          <!-- Destination -->
+          <div class="route-point destination">
+            <div class="point-icon destination-icon">
+              <mat-icon>navigation</mat-icon>
+            </div>
+            <div class="point-details">
+              <h4>{{itinerary.destination?.stopName}}</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bus Information -->
+        <div class="bus-info" *ngIf="itinerary.buses && itinerary.buses.length > 0">
+          <div class="bus-count">
+            <mat-icon>directions_bus</mat-icon>
+            <span>{{itinerary.buses.length}} bus{{itinerary.buses.length !== 1 ? 'es' : ''}} available</span>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions class="route-actions">
+        <button mat-button color="primary" class="action-btn">
+          <mat-icon>info</mat-icon>
+          View Details
+        </button>
+        <button mat-button class="action-btn">
+          <mat-icon>schedule</mat-icon>
+          Schedule
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- No Results -->
+  <div class="no-results" *ngIf="!loading && itineraries.length === 0">
+    <mat-card class="glass-effect no-results-card">
+      <mat-card-content>
+        <mat-icon class="no-results-icon">route</mat-icon>
+        <h3>No routes found</h3>
+        <p *ngIf="searchQuery" class="no-results-text">
+          We couldn't find any routes for "{{searchQuery}}". 
+          Try searching for a different location or check your spelling.
+        </p>
+        <p *ngIf="!searchQuery" class="no-results-text">
+          Start by searching for your departure point, destination, or a stop along the way.
+        </p>
+        <button mat-raised-button color="primary" (click)="clearSearch()" *ngIf="searchQuery" class="glow-btn">
+          <mat-icon>refresh</mat-icon>
+          Show All Routes
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
