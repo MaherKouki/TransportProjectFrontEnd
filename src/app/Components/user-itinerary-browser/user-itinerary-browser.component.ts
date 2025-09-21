@@ -178,6 +178,7 @@
 
 
 
+
 import { Component, type OnInit } from "@angular/core"
 import { CommonModule } from "@angular/common"
 import { FormsModule } from "@angular/forms"
@@ -189,14 +190,16 @@ import { MatIconModule } from "@angular/material/icon"
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner"
 import { MatChipsModule } from "@angular/material/chips"
 import { HttpClientModule } from "@angular/common/http"
+import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar"
 
 import { RouteDetailsComponent } from "../route-details/route-details.component"
 import { MatDialog, MatDialogModule } from "@angular/material/dialog"
-import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar"
 import { Itinerary } from "../../entity/itinerary"
 import { Stop } from "../../entity/stop"
 import { ItineraryService } from "../../service/ItineraryService/itinerary.service"
 import { StopService } from "../../service/StopService/stop.service"
+import { BusPositionService } from "../../service/BusPositionService/bus-position.service"
+
 
 
 @Component({
@@ -228,9 +231,18 @@ export class UserItineraryBrowserComponent implements OnInit {
   showSuggestions = false
   filteredSuggestions: Stop[] = []
 
+  selectedDestination: Stop | null = null
+  userLocation: { latitude: number; longitude: number } | null = null
+  nearestStop: Stop | null = null
+  travelTime: number | null = null
+  busDistances: { [busId: number]: number } = {}
+  locationLoading = false
+  showLocationInfo = false
+
   constructor(
     private itineraryService: ItineraryService,
     private stopService: StopService,
+    private busPositionService: BusPositionService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
   ) {}
@@ -280,6 +292,9 @@ export class UserItineraryBrowserComponent implements OnInit {
   selectSuggestion(stop: Stop): void {
     this.searchQuery = stop.stopName
     this.showSuggestions = false
+    if (this.searchType === "destination") {
+      this.selectedDestination = stop
+    }
     this.searchRoutes()
   }
 
@@ -351,5 +366,149 @@ export class UserItineraryBrowserComponent implements OnInit {
     this.searchQuery = ""
     this.showSuggestions = false
     this.loadAllItineraries()
+  }
+
+  getCurrentLocation(): void {
+    if (!this.selectedDestination) {
+      this.snackBar.open("Please select a destination first", "Close", { duration: 3000 })
+      return
+    }
+
+    if (!navigator.geolocation) {
+      this.snackBar.open("Geolocation is not supported by this browser", "Close", { duration: 3000 })
+      return
+    }
+
+    this.locationLoading = true
+    this.showLocationInfo = false
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        this.userLocation = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        }
+        this.findNearestStop()
+      },
+      (error) => {
+        console.error("Error getting location:", error)
+        this.snackBar.open("Unable to get your location. Please enable location services.", "Close", { duration: 3000 })
+        this.locationLoading = false
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000,
+      },
+    )
+  }
+
+  selectDestinationStop(stop: Stop): void {
+    this.selectedDestination = stop
+    this.searchType = "destination"
+    this.searchQuery = stop.stopName
+
+    // Reset location info when selecting new destination
+    this.showLocationInfo = false
+    this.nearestStop = null
+    this.travelTime = null
+    this.busDistances = {}
+
+    this.snackBar.open(`Selected "${stop.stopName}" as destination`, "Close", { duration: 2000 })
+  }
+
+  private findNearestStop(): void {
+    if (!this.userLocation || !this.selectedDestination) return
+
+    this.busPositionService
+      .getNearestStop(this.userLocation.latitude, this.userLocation.longitude, this.selectedDestination.idStop!)
+      .subscribe({
+        next: (nearestStop) => {
+          this.nearestStop = nearestStop
+          this.getTravelTimeToStop()
+        },
+        error: (error) => {
+          console.error("Error finding nearest stop:", error)
+          this.snackBar.open("Error finding nearest stop", "Close", { duration: 3000 })
+          this.locationLoading = false
+        },
+      })
+  }
+
+  private getTravelTimeToStop(): void {
+    if (!this.userLocation || !this.selectedDestination) return
+
+    this.busPositionService
+      .getTravelTime(this.userLocation.latitude, this.userLocation.longitude, this.selectedDestination.idStop!)
+      .subscribe({
+        next: (travelTime) => {
+          this.travelTime = travelTime
+          this.getBusDistances()
+        },
+        error: (error) => {
+          console.error("Error getting travel time:", error)
+          this.snackBar.open("Error calculating travel time", "Close", { duration: 3000 })
+          this.locationLoading = false
+        },
+      })
+  }
+
+  private getBusDistances(): void {
+    if (!this.nearestStop || !this.itineraries.length) {
+      this.locationLoading = false
+      this.showLocationInfo = true
+      return
+    }
+
+    const busIds: number[] = []
+    this.itineraries.forEach((itinerary) => {
+      if (itinerary.buses) {
+        itinerary.buses.forEach((bus) => {
+          if (bus.idBus && !busIds.includes(bus.idBus)) {
+            busIds.push(bus.idBus)
+          }
+        })
+      }
+    })
+
+    if (busIds.length === 0) {
+      this.locationLoading = false
+      this.showLocationInfo = true
+      return
+    }
+
+    let completedRequests = 0
+    busIds.forEach((busId) => {
+      this.busPositionService.getDistanceBusToStop(busId, this.nearestStop!.idStop!).subscribe({
+        next: (distance) => {
+          this.busDistances[busId] = distance
+          completedRequests++
+          if (completedRequests === busIds.length) {
+            this.locationLoading = false
+            this.showLocationInfo = true
+          }
+        },
+        error: (error) => {
+          console.error(`Error getting distance for bus ${busId}:`, error)
+          completedRequests++
+          if (completedRequests === busIds.length) {
+            this.locationLoading = false
+            this.showLocationInfo = true
+          }
+        },
+      })
+    })
+  }
+
+  getBusDistance(busId: number): number | null {
+    return this.busDistances[busId] || null
+  }
+
+  formatDistance(distance: number): string {
+    if (distance < 1000) {
+      return `${Math.round(distance)}m`
+    } else {
+      return `${(distance / 1000).toFixed(1)}km`
+    }
   }
 }

@@ -45,7 +45,7 @@ export class StopService {
   }
 
   getAllStops(): Observable<Stop[]> {
-    return this.http.get<Stop[]>(`${this.baseUrl}/getAllStops`)
+    return this.http.get<Stop[]>(`${this.baseUrl}/allStops`)
   }
 
   updateStop(stopId: number, stop: Stop): Observable<Stop> {

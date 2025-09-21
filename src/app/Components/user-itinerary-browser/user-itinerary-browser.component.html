@@ -178,10 +178,6 @@
 
 
 
-
-
-
-
 <div class="itinerary-browser-container">
   <!-- Header -->
   <div class="header-section">
@@ -270,6 +266,19 @@
           </button>
         </div>
 
+        <!-- Added location button section -->
+        <div class="location-section" *ngIf="selectedDestination && searchType === 'destination'">
+          <button 
+            mat-raised-button 
+            color="accent" 
+            class="location-button glow-btn"
+            (click)="getCurrentLocation()"
+            [disabled]="locationLoading">
+            <mat-icon>my_location</mat-icon>
+            {{locationLoading ? 'Getting Location...' : 'Get My Location & Nearest Stop'}}
+          </button>
+        </div>
+
         <!-- Search Suggestions -->
         <div class="suggestions-container glass-effect" *ngIf="showSuggestions">
           <div 
@@ -278,6 +287,49 @@
             (click)="selectSuggestion(suggestion)">
             <mat-icon>location_on</mat-icon>
             <span>{{suggestion.stopName}}</span>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Added location information section -->
+  <mat-card class="location-info-card glass-effect" *ngIf="showLocationInfo && nearestStop">
+    <mat-card-header>
+      <mat-card-title class="location-info-title">
+        <mat-icon>location_on</mat-icon>
+        Your Location Information
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="location-details">
+        <div class="location-item">
+          <div class="location-icon">
+            <mat-icon>place</mat-icon>
+          </div>
+          <div class="location-text">
+            <h4>Nearest Stop</h4>
+            <p>{{nearestStop.stopName}}</p>
+          </div>
+        </div>
+        
+        <div class="location-item" *ngIf="travelTime !== null">
+          <div class="location-icon">
+            <mat-icon>schedule</mat-icon>
+          </div>
+          <div class="location-text">
+            <h4>Walking Time</h4>
+            <p>{{travelTime}} minutes</p>
+          </div>
+        </div>
+
+        <div class="location-item" *ngIf="selectedDestination">
+          <div class="location-icon">
+            <mat-icon>navigation</mat-icon>
+          </div>
+          <div class="location-text">
+            <h4>Destination</h4>
+            <p>{{selectedDestination.stopName}}</p>
           </div>
         </div>
       </div>
@@ -312,34 +364,33 @@
       </mat-card-header>
 
       <mat-card-content class="route-content">
-        <div class="route-path">
-          <!-- Departure -->
-          <div class="route-point departure">
-            <div class="point-icon departure-icon">
-              <mat-icon>place</mat-icon>
-            </div>
-            <div class="point-details">
-              <h4>{{itinerary.departure?.stopName}}</h4>
-              <small *ngIf="itinerary.startTime">Departs: {{itinerary.startTime}}</small>
-            </div>
-          </div>
-
-          <!-- Intermediate Stops -->
-          <div class="route-connector" *ngIf="itinerary.stops && itinerary.stops.length > 2">
-            <div class="connector-line"></div>
-            <div class="stops-indicator">
-              <mat-icon>more_horiz</mat-icon>
-              <span>{{itinerary.stops.length - 2}} stops</span>
-            </div>
-          </div>
-
-          <!-- Destination -->
-          <div class="route-point destination">
-            <div class="point-icon destination-icon">
-              <mat-icon>navigation</mat-icon>
-            </div>
-            <div class="point-details">
-              <h4>{{itinerary.destination?.stopName}}</h4>
+        <!-- Added clickable stops section to replace route-path -->
+        <div class="stops-list">
+          <h4 class="stops-title">
+            <mat-icon>location_on</mat-icon>
+            Select your destination stop:
+          </h4>
+          
+          <div class="stops-container">
+            <div 
+              *ngFor="let stop of itinerary.stops; let i = index" 
+              class="stop-item"
+              [class.selected]="selectedDestination?.idStop === stop.idStop"
+              (click)="selectDestinationStop(stop)">
+              
+              <div class="stop-icon">
+                <mat-icon *ngIf="selectedDestination?.idStop === stop.idStop">check_circle</mat-icon>
+                <mat-icon *ngIf="selectedDestination?.idStop !== stop.idStop">radio_button_unchecked</mat-icon>
+              </div>
+              
+              <div class="stop-details">
+                <span class="stop-name">{{stop.stopName}}</span>
+                <span class="stop-order">Stop {{i + 1}}</span>
+              </div>
+              
+              <div class="stop-actions" *ngIf="selectedDestination?.idStop === stop.idStop">
+                <mat-icon class="selected-icon">done</mat-icon>
+              </div>
             </div>
           </div>
         </div>
@@ -350,11 +401,20 @@
             <mat-icon>directions_bus</mat-icon>
             <span>{{itinerary.buses.length}} bus{{itinerary.buses.length !== 1 ? 'es' : ''}} available</span>
           </div>
+          <!-- Bus distance information -->
+          <div class="bus-distances" *ngIf="showLocationInfo && nearestStop">
+            <div class="bus-distance-item" *ngFor="let bus of itinerary.buses">
+              <span class="bus-id">Bus {{bus.matricule}}</span>
+              <span class="distance" *ngIf="getBusDistance(bus.idBus)">
+                {{formatDistance(getBusDistance(bus.idBus)!)}} from nearest stop
+              </span>
+            </div>
+          </div>
         </div>
       </mat-card-content>
 
       <mat-card-actions class="route-actions">
-        <button mat-button color="primary" class="action-btn">
+        <button mat-button color="primary" class="action-btn" (click)="viewRouteDetails(itinerary)">
           <mat-icon>info</mat-icon>
           View Details
         </button>
