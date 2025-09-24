@@ -132,4 +132,23 @@ export class BusPositionService {
     if (timestamp) params.timestamp = timestamp
     return this.http.post<BusPosition>(`${this.apiUrl}/update`, null, { params })
   }
+
+
+
+
+
+
+
+
+  sendPosition(busId: number, lat: number, lon: number) {
+    const params = {
+      busId: busId,
+      latitude: lat,
+      longitude: lon,
+      time: Date.now()
+    };
+    return this.http.post(this.apiUrl+ '/savePosition', null, { params });
+  }
+
 }
+

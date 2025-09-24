@@ -19,9 +19,13 @@ import { DriverTrackingComponent } from './Components/driver-tracking/driver-tra
 import { ItineraryMapComponent } from './Components/itinerary-map/itinerary-map.component';
 import { AddStopsMapComponent } from './Components/add-stops-map/add-stops-map.component';
 import { RouteDetailsComponent } from './Components/route-details/route-details.component';
+//import { UserItineraryBrowserComponent, UserItineraryBrowserrrComponent } from './Components/user-itinerary-browser/user-itinerary-browser.component';
+import { TrackingComponent } from './tracking/tracking.component';
 import { UserItineraryBrowserComponent } from './Components/user-itinerary-browser/user-itinerary-browser.component';
+import { UserItineraryBrowserrComponent } from './Components/user-itinerary-browserr/user-itinerary-browserr.component';
 
 export const routes: Routes = [
+
   { path: "", redirectTo: "/dashboard", pathMatch: "full" },
   { path: "dashboard", component: DashboardComponent },
   { path: "buses", component: BusListComponent },
@@ -40,6 +44,7 @@ export const routes: Routes = [
 
   { path: 'userItinerary', component: UserItineraryBrowserComponent },
 
+  { path: 'mainItinerary', component: UserItineraryBrowserrComponent },
 
 
 
@@ -47,4 +52,7 @@ export const routes: Routes = [
   { path: "bus-tracking", component: BusTrackingComponent },
   { path: "nearest-stop", component: NearestStopComponent },
   { path: "driver-tracking", component: DriverTrackingComponent },
+
+  { path: "trackBus", component: TrackingComponent },
+
 ];

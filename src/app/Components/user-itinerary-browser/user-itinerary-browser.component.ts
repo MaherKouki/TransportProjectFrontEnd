@@ -390,6 +390,7 @@ export class UserItineraryBrowserComponent implements OnInit {
         }
         console.log("latitude : " + this.userLocation.latitude + "longitude : " + this.userLocation.longitude)
         this.findNearestStop()
+        console.log(this.findNearestStop.name)
       },
       (error) => {
         console.error("Error getting location:", error)

@@ -46,7 +46,8 @@
 
 
 import { Component } from '@angular/core';
-import { BusPositionService } from '../service/bus-position.service';
+import { BusPositionService } from '../service/BusPositionService/bus-position.service';
+//import { BusPositionService } from '../service/bus-position.service';
 
 @Component({
   selector: 'app-tracking',
@@ -92,7 +93,7 @@ export class TrackingComponent {
           console.log('History:', this.history);
 
           // Send to backend
-          this.service.sendPosition(2, lat, lon).subscribe();
+          this.service.sendPosition(1, lat, lon).subscribe();
         },
         err => this.currentStatus = 'Error: ' + err.message,
         { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
