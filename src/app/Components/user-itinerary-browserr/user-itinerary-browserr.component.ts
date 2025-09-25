@@ -7,20 +7,19 @@ import { MatInputModule } from "@angular/material/input"
 import { MatButtonModule } from "@angular/material/button"
 import { MatIconModule } from "@angular/material/icon"
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner"
-import { MatChip, MatChipsModule } from "@angular/material/chips"
+import { MatChipsModule } from "@angular/material/chips"
 import { HttpClientModule } from "@angular/common/http"
 import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar"
 import { RouteDetailsComponent } from "../route-details/route-details.component"
 import { MatDialog, MatDialogModule } from "@angular/material/dialog"
 import { Itinerary } from "../../entity/itinerary"
-//import { Stop } from "../../entity/stop"
+import { Stop } from "../../entity/stop"
 import { Bus } from "../../entity/bus"
 import { BusPosition } from "../../entity/busPosition"
 import { ItineraryService } from "../../service/ItineraryService/itinerary.service"
 import { StopService } from "../../service/StopService/stop.service"
 import { BusPositionService } from "../../service/BusPositionService/bus-position.service"
 import * as L from 'leaflet'
-import { Stop } from "../../entity/stop"
 
 @Component({
   selector: "app-user-itinerary-browserr",
@@ -37,13 +36,13 @@ import { Stop } from "../../entity/stop"
     MatIconModule,
     MatProgressSpinnerModule,
     MatChipsModule,
-    MatChip,
     MatDialogModule,
     MatSnackBarModule,
     HttpClientModule,
   ],
 })
 export class UserItineraryBrowserrComponent implements OnInit {
+  // Search and UI state
   searchQuery = ""
   loading = false
   showSuggestions = false
@@ -195,13 +194,14 @@ export class UserItineraryBrowserrComponent implements OnInit {
         // Find nearest stop to user on all available routes
         this.findNearestStopToUserOnAvailableRoutes()
         
+        // Always show location info after finding nearest stop
+        this.locationLoading = false
+        this.showLocationInfo = true
+        
         // If user has selected an itinerary, calculate bus distances
         if (this.selectedItinerary) {
           this.calculateBusDistances()
         }
-        
-        this.locationLoading = false
-        this.showLocationInfo = true
       },
       (error) => {
         console.error("Error getting location:", error)
@@ -263,7 +263,6 @@ export class UserItineraryBrowserrComponent implements OnInit {
     let nearestDistance = Infinity
     let nearestStop: Stop | null = null
 
-
     availableStops.forEach((stop) => {
       try {
         const stopLatLng = L.latLng(stop.latitude!, stop.longitude!)
@@ -274,7 +273,7 @@ export class UserItineraryBrowserrComponent implements OnInit {
           nearestStop = stop
         }
       } catch (error) {
-        console.error(`Error calculating distance to stop ${stop.stopName}:`, error)
+        console.error(`Error calculating distance to stop ${stop.stopName || 'Unknown Stop'}:`, error)
       }
     })
 
@@ -287,15 +286,9 @@ export class UserItineraryBrowserrComponent implements OnInit {
       this.walkingTimeToNearestStop = Math.round(this.distanceToNearestStop / walkingSpeedMPS / 60)
     }
 
-    //console.log(`Nearest stop to user: ${nearestStop?.stopName || 'Unknown'} (${this.formatDistance(nearestDistance)})`)
+    //console.log(`Nearest stop to user: ${nearestStop.stopName || 'Unknown Stop'} (${this.formatDistance(nearestDistance)})`)
 
-//     if (nearestStop !== null) {
-//   console.log(`Nearest stop to user: ${nearestStop.stopName || 'Unknown'} (${this.formatDistance(nearestDistance)})`)
-// } else {
-//   console.log('No nearest stop found')
-// }
-
-console.log(`Nearest stop to user: ${(nearestStop as Stop | null)?.stopName || 'Unknown'} (${this.formatDistance(nearestDistance)})`)
+  console.log(`Nearest stop to user: ${(nearestStop as Stop | null)?.stopName || 'Unknown'} (${this.formatDistance(nearestDistance)})`)
 
   }
 
@@ -325,7 +318,7 @@ console.log(`Nearest stop to user: ${(nearestStop as Stop | null)?.stopName || '
             nearestStop = stop
           }
         } catch (error) {
-          console.error(`Error calculating distance to stop ${stop.stopName}:`, error)
+          console.error(`Error calculating distance to stop ${stop.stopName || 'Unknown Stop'}:`, error)
         }
       }
     })
@@ -351,7 +344,7 @@ console.log(`Nearest stop to user: ${(nearestStop as Stop | null)?.stopName || '
     this.busPositions = {}
     this.busPositionsLoading = true
 
-    console.log(`Calculating distances for ${this.selectedItinerary.buses.length} buses to user's nearest stop: ${this.nearestStopToUser.stopName}`)
+    console.log(`Calculating distances for ${this.selectedItinerary.buses.length} buses to user's nearest stop: ${this.nearestStopToUser.stopName || 'Unknown Stop'}`)
 
     let completedRequests = 0
     const totalBuses = this.selectedItinerary.buses.length
@@ -378,7 +371,7 @@ console.log(`Nearest stop to user: ${(nearestStop as Stop | null)?.stopName || '
                 this.busDistancesToUserNearestStop[bus.idBus!] = distanceToUserStop
               }
 
-              console.log(`Bus ${bus.idBus} (${bus.matricule}) - Position: [${busPosition.latitude}, ${busPosition.longitude}], Distance to user's nearest stop (${this.nearestStopToUser?.stopName}): ${distanceToUserStop ? this.formatDistance(distanceToUserStop) : 'N/A'}`)
+              console.log(`Bus ${bus.idBus} (${bus.matricule}) - Position: [${busPosition.latitude}, ${busPosition.longitude}], Distance to user's nearest stop (${this.nearestStopToUser?.stopName || 'Unknown Stop'}): ${distanceToUserStop ? this.formatDistance(distanceToUserStop) : 'N/A'}`)
             } else {
               console.warn(`No valid position found for bus ${bus.idBus} (${bus.matricule})`)
             }
@@ -414,7 +407,7 @@ console.log(`Nearest stop to user: ${(nearestStop as Stop | null)?.stopName || '
     }
 
     if (!this.nearestStopToUser.latitude || !this.nearestStopToUser.longitude) {
-      console.warn(`User's nearest stop ${this.nearestStopToUser.stopName} has no valid coordinates`)
+      console.warn(`User's nearest stop ${this.nearestStopToUser.stopName || 'Unknown Stop'} has no valid coordinates`)
       return null
     }
 
@@ -425,7 +418,7 @@ console.log(`Nearest stop to user: ${(nearestStop as Stop | null)?.stopName || '
       // Calculate distance from bus to USER'S nearest stop
       const distance = busLatLng.distanceTo(userNearestStopLatLng) // Distance in meters
       
-      console.log(`Bus ${busId} distance to user's nearest stop (${this.nearestStopToUser.stopName}): ${this.formatDistance(distance)}`)
+      console.log(`Bus ${busId} distance to user's nearest stop (${this.nearestStopToUser.stopName || 'Unknown Stop'}): ${this.formatDistance(distance)}`)
       return distance
       
     } catch (error) {
@@ -602,7 +595,7 @@ console.log(`Nearest stop to user: ${(nearestStop as Stop | null)?.stopName || '
 
   // Get stop display name
   getStopDisplayName(stop: Stop): string {
-    return stop.stopName || `Stop ${stop.idStop || 'Unknown'}`
+    return (stop as any).stopName || `Stop ${stop.idStop || 'Unknown'}`
   }
 
   // Get bus display name
