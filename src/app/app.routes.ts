@@ -56,7 +56,10 @@ export const routes: Routes = [
 
   { path: "trackBus", component: TrackingComponent },
 
-  { path: "liveTracking", component: LiveBusTrackingComponent },
+  
+
+  { path: 'liveTracking/:busId', component: LiveBusTrackingComponent },
+
 
 
 ];

@@ -1,3 +1,422 @@
+<!-- <div class="user-itinerary-container">
+  <div class="header-section">
+    <h2>Find Your Bus Route</h2>
+    <div class="workflow-steps">
+      <div class="step" [class.active]="workflowStep >= 1" [class.completed]="workflowStep > 1">
+        <span class="step-number">1</span>
+        <span class="step-label">Choose Destination</span>
+      </div>
+      <div class="step" [class.active]="workflowStep >= 2" [class.completed]="workflowStep > 2">
+        <span class="step-number">2</span>
+        <span class="step-label">Select Route</span>
+      </div>
+      <div class="step" [class.active]="workflowStep >= 3" [class.completed]="workflowStep > 3">
+        <span class="step-number">3</span>
+        <span class="step-label">Get Location</span>
+      </div>
+      <div class="step" [class.active]="workflowStep >= 4">
+        <span class="step-number">4</span>
+        <span class="step-label">View Results</span>
+      </div>
+    </div>
+  </div>
+
+  <mat-card class="search-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>place</mat-icon>
+        Step 1: Where do you want to go?
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="search-container">
+        <mat-form-field appearance="fill" class="search-field">
+          <mat-label>Search for your destination stop</mat-label>
+          <input
+            matInput
+            [(ngModel)]="searchQuery"
+            (input)="onSearchInput()"
+            placeholder="e.g., Nabeul, Central Station..."
+          >
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+        
+        <button 
+          mat-raised-button 
+          color="warn" 
+          *ngIf="searchQuery" 
+          (click)="clearSearch()"
+          class="clear-btn">
+          <mat-icon>clear</mat-icon>
+          Clear
+        </button>
+      </div>
+      
+      <div class="suggestions-container" *ngIf="showSuggestions">
+        <div class="suggestion-item" 
+             *ngFor="let stop of filteredSuggestions" 
+             (click)="selectDestinationStop(stop)">
+          <mat-icon>location_on</mat-icon>
+          <span>{{ getStopDisplayName(stop) }}</span>
+          <small class="stop-order" *ngIf="stop.orderIndex">Order: {{ stop.orderIndex }}</small>
+        </div>
+      </div>
+      
+      <div class="selected-destination" *ngIf="selectedDestinationStop">
+        <mat-chip color="primary" selected>
+          <mat-icon matChipAvatar>flag</mat-icon>
+          {{ getStopDisplayName(selectedDestinationStop) }}
+        </mat-chip>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="itineraries-card" *ngIf="selectedDestinationStop">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>route</mat-icon>
+        Step 2: Available Routes to {{ getStopDisplayName(selectedDestinationStop) }}
+      </mat-card-title>
+      <mat-card-subtitle>
+        Found {{ itineraries.length }} route(s)
+      </mat-card-subtitle>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Loading routes...</p>
+      </div>
+      
+      <div class="itineraries-list" *ngIf="!loading">
+        <div class="itinerary-item" 
+             *ngFor="let itinerary of itineraries"
+             [class.selected]="selectedItinerary?.idItinerary === itinerary.idItinerary"
+             (click)="selectItinerary(itinerary)">
+          
+          <div class="itinerary-header">
+            <h3>{{ getItineraryDisplayName(itinerary) }}</h3>
+            <mat-chip *ngIf="selectedItinerary?.idItinerary === itinerary.idItinerary" color="primary">
+              Selected
+            </mat-chip>
+          </div>
+          
+          <div class="itinerary-info">
+            <div class="info-item" *ngIf="itinerary.startTime">
+              <mat-icon>schedule</mat-icon>
+              <span>Starts: {{ itinerary.startTime }}</span>
+            </div>
+            <div class="info-item">
+              <mat-icon>directions_bus</mat-icon>
+              <span>{{ itinerary.buses?.length || 0 }} bus(es)</span>
+            </div>
+            <div class="info-item">
+              <mat-icon>location_on</mat-icon>
+              <span>{{ itinerary.stops?.length || 0 }} stops</span>
+            </div>
+            <div class="info-item" *ngIf="itinerary.departure">
+              <mat-icon>departure_board</mat-icon>
+              <span>From: {{ getStopDisplayName(itinerary.departure) }}</span>
+            </div>
+            <div class="info-item" *ngIf="itinerary.destination">
+              <mat-icon>flag</mat-icon>
+              <span>To: {{ getStopDisplayName(itinerary.destination) }}</span>
+            </div>
+          </div>
+          
+          <div class="itinerary-actions">
+            <button mat-button color="primary" (click)="viewRouteDetails(itinerary); $event.stopPropagation()">
+              <mat-icon>info</mat-icon>
+              Details
+            </button>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="location-card" *ngIf="selectedDestinationStop">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>my_location</mat-icon>
+        Step 3: Get Your Location
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="location-actions">
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="getCurrentLocation()"
+          [disabled]="locationLoading || !canGetLocation">
+          <mat-icon>gps_fixed</mat-icon>
+          {{ locationLoading ? 'Getting Location...' : 'Get My Location' }}
+        </button>
+        
+        <button 
+          mat-button 
+          color="warn" 
+          *ngIf="userLocation" 
+          (click)="clearLocationData()">
+          <mat-icon>gps_off</mat-icon>
+          Clear Location
+        </button>
+
+        <button 
+          mat-button 
+          color="accent" 
+          *ngIf="canShowBusInfo" 
+          (click)="refreshBusPositions()"
+          [disabled]="busPositionsLoading">
+          <mat-icon>refresh</mat-icon>
+          {{ busPositionsLoading ? 'Refreshing...' : 'Refresh Buses' }}
+        </button>
+      </div>
+      
+      <div class="location-status" *ngIf="locationLoading">
+        <mat-spinner diameter="30"></mat-spinner>
+        <span>Finding your location...</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="results-section" *ngIf="showLocationInfo && userLocation && selectedItinerary">
+    
+    <mat-card class="user-info-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>directions_walk</mat-icon>
+          Your Nearest Stop
+        </mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <div class="nearest-stop-info" *ngIf="nearestStopToUser">
+          <div class="stop-details">
+            <h3>{{ getStopDisplayName(nearestStopToUser) }}</h3>
+            <p class="stop-description">This is where you should wait for your bus</p>
+            <div class="stop-metadata" *ngIf="nearestStopToUser.orderIndex">
+              <span class="order-badge">Stop #{{ nearestStopToUser.orderIndex }}</span>
+            </div>
+            <div class="distance-info">
+              <div class="distance-item">
+                <mat-icon>straighten</mat-icon>
+                <span>{{ formatDistance(distanceToNearestStop!) }}</span>
+              </div>
+              <div class="time-item">
+                <mat-icon>schedule</mat-icon>
+                <span>{{ formatTime(walkingTimeToNearestStop!) }} walk</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="buses-info-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>directions_bus</mat-icon>
+          Buses on Selected Route: {{ getItineraryDisplayName(selectedItinerary) }}
+        </mat-card-title>
+        <mat-card-subtitle>
+          Distance from each bus to your nearest stop: {{ getStopDisplayName(nearestStopToUser!) }}
+        </mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <div class="bus-loading" *ngIf="busPositionsLoading">
+          <mat-spinner diameter="30"></mat-spinner>
+          <span>Loading bus positions...</span>
+        </div>
+
+        <div class="buses-list" *ngIf="!busPositionsLoading">
+          <div class="bus-item" *ngFor="let bus of getAllBusesWithStatus()">
+            <div class="bus-header">
+              <div class="bus-info">
+                <mat-icon>directions_bus</mat-icon>
+                <div class="bus-details-header">
+                  <span class="bus-name">{{ getBusDisplayName(bus) }}</span>
+                  <div class="bus-metadata">
+                    <span class="bus-id">ID: {{ bus.idBus }}</span>
+                    <span class="bus-brand" *ngIf="bus.marque">{{ bus.marque }}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="bus-status-badges">
+<mat-chip [color]="bus.hasData ? 'primary' : 'warn'">
+  {{ bus.status }}
+</mat-chip>
+                <mat-chip 
+                  *ngIf="bus.hasData && isPositionDataFresh(bus.idBus)"
+                  color="accent"
+                  class="fresh-data-badge">
+                  <mat-icon>schedule</mat-icon>
+                  Fresh
+                </mat-chip>
+              </div>
+            </div>
+            
+            <div class="bus-details" *ngIf="bus.hasData">
+              <div class="detail-row">
+                <mat-icon>place</mat-icon>
+                <span class="label">Current Position:</span>
+                <span class="value coordinates">
+                  {{ getBusPosition(bus.idBus)?.latitude | number:'1.4-4' }}, 
+                  {{ getBusPosition(bus.idBus)?.longitude | number:'1.4-4' }}
+                </span>
+              </div>
+              
+              <div class="detail-row">
+                <mat-icon>schedule</mat-icon>
+                <span class="label">Last Update:</span>
+                <span class="value">
+                  {{ formatTimestamp(getBusPosition(bus.idBus)!.timestamp) }}
+                  <small class="time-ago">({{ getTimeSinceLastUpdate(getBusPosition(bus.idBus)!.timestamp) }})</small>
+                </span>
+              </div>
+              
+              <div class="detail-row">
+                <mat-icon>location_on</mat-icon>
+                <span class="label">Target Stop:</span>
+                <span class="value">{{ getStopDisplayName(nearestStopToUser!) }}</span>
+              </div>
+              
+              <div class="detail-row">
+                <mat-icon>straighten</mat-icon>
+                <span class="label">Distance to Your Stop:</span>
+                <span class="value highlight">{{ formatDistance(getBusDistance(bus.idBus)!) }}</span>
+              </div>
+              
+              <div class="detail-row">
+                <mat-icon>schedule</mat-icon>
+                <span class="label">ETA to Your Stop:</span>
+                <span class="value highlight">{{ getBusETA(bus.idBus) }}</span>
+              </div>
+            </div>
+            
+            <div class="no-data" *ngIf="!bus.hasData">
+              <mat-icon>warning</mat-icon>
+              <div class="no-data-content">
+                <span>Bus position not available</span>
+                <small>This bus may be offline or out of service</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bus-summary" *ngIf="getBusesSortedByDistance().length > 0">
+          <h4>
+            <mat-icon>insights</mat-icon>
+            Quick Summary (Sorted by Distance to Your Stop)
+          </h4>
+          <div class="summary-list">
+            <div class="summary-item" *ngFor="let bus of getBusesSortedByDistance(); let i = index">
+              <div class="rank">{{ i + 1 }}</div>
+              <div class="bus-summary-info">
+                <span class="bus-name">{{ getBusDisplayName(bus) }}</span>
+                <div class="bus-summary-meta">
+                  <span class="bus-brand">{{ bus.marque }}</span>
+                  <span class="last-update">{{ getTimeSinceLastUpdate(getBusPosition(bus.idBus)!.timestamp) }}</span>
+                </div>
+                <div class="summary-details">
+                  <span class="distance">{{ formatDistance(getBusDistance(bus.idBus)!) }}</span>
+                  <span class="eta">ETA: {{ getBusETA(bus.idBus) }}</span>
+                </div>
+              </div>
+              <div class="badges">
+                <mat-chip *ngIf="i === 0" color="primary" class="best-choice">
+                  <mat-icon>star</mat-icon>
+                  Best Choice
+                </mat-chip>
+                <mat-chip *ngIf="isPositionDataFresh(bus.idBus)" color="accent" class="fresh-badge">
+                  Live
+                </mat-chip>
+              </div>
+            </div>
+          </div>
+          
+          <div class="summary-note">
+            <mat-icon>info</mat-icon>
+            <span>Choose the bus with the shortest ETA to reach your stop first!</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="empty-state" *ngIf="!selectedDestinationStop">
+    <mat-icon>place</mat-icon>
+    <h3>Welcome!</h3>
+    <p>Start by searching for your destination stop above.</p>
+    <p class="help-text">You can search for any bus stop name, like "Nabeul", "Central Station", etc.</p>
+  </div>
+
+  <div class="empty-state" *ngIf="selectedDestinationStop && itineraries.length === 0 && !loading">
+    <mat-icon>route</mat-icon>
+    <h3>No Routes Found</h3>
+    <p>No bus routes pass through <strong>"{{ getStopDisplayName(selectedDestinationStop) }}"</strong>.</p>
+    <p>Try searching for a different destination or check the spelling.</p>
+    <button mat-raised-button color="primary" (click)="clearSearch()">
+      <mat-icon>search</mat-icon>
+      Search Again
+    </button>
+  </div>
+
+  <div class="empty-state" *ngIf="selectedDestinationStop && selectedItinerary && !userLocation && !locationLoading">
+    <mat-icon>my_location</mat-icon>
+    <h3>Get Your Location</h3>
+    <p>To see bus information and find your nearest stop, we need your current location.</p>
+    <button mat-raised-button color="primary" (click)="getCurrentLocation()">
+      <mat-icon>gps_fixed</mat-icon>
+      Get My Location
+    </button>
+  </div>
+
+  <div class="empty-state" *ngIf="canShowBusInfo && getAllBusesWithStatus().length === 0">
+    <mat-icon>directions_bus</mat-icon>
+    <h3>No Buses Available</h3>
+    <p>No buses are currently assigned to this route.</p>
+    <p>Please try a different route or contact the transport service.</p>
+  </div>
+</div> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <div class="user-itinerary-container">
   <!-- Header -->
   <div class="header-section">
@@ -256,9 +675,9 @@
               </div>
               
               <div class="bus-status-badges">
-<mat-chip [color]="bus.hasData ? 'primary' : 'warn'">
-  {{ bus.status }}
-</mat-chip>
+                <mat-chip [color]="bus.hasData ? 'primary' : 'warn'">
+                  {{ bus.status }}
+                </mat-chip>
                 <mat-chip 
                   *ngIf="bus.hasData && isPositionDataFresh(bus.idBus)"
                   color="accent"
@@ -304,6 +723,13 @@
                 <mat-icon>schedule</mat-icon>
                 <span class="label">ETA to Your Stop:</span>
                 <span class="value highlight">{{ getBusETA(bus.idBus) }}</span>
+              </div>
+
+              <div class="bus-actions" *ngIf="bus.hasData">
+                <button mat-button color="primary" (click)="trackBusLive(bus.idBus)">
+                  <mat-icon>track_changes</mat-icon>
+                  Track Live
+                </button>
               </div>
             </div>
             

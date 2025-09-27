@@ -1,4 +1,4 @@
-<p>live-bus-tracking works!</p>
+<!-- <p>live-bus-tracking works!</p>
 
 <div class="controls">
   <label for="busId">Bus ID:</label>
@@ -7,4 +7,201 @@
 </div>
 
 <div id="map"></div>
+ -->
 
+
+
+
+
+
+
+
+
+ <div class="live-tracking-container">
+  <!-- Header -->
+  <div class="header">
+    <h1>Live Bus Tracking</h1>
+    <p *ngIf="busId">Tracking Bus #{{busId}}</p>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <div class="control-group">
+      <label for="busId">Bus ID:</label>
+      <input 
+        id="busId" 
+        type="number" 
+        [(ngModel)]="busId" 
+        placeholder="Enter Bus ID"
+      />
+    </div>
+
+    <button (click)="startTracking()" [disabled]="!busId">
+      {{intervalId ? 'Restart Tracking' : 'Start Tracking'}}
+    </button>
+  </div>
+
+  <!-- Map -->
+  <div class="map-container">
+    <h3>Bus Location</h3>
+    <div id="map"></div>
+    <div class="map-info" *ngIf="positions.length > 0">
+      <span>Positions tracked: {{positions.length}}</span>
+      <span *ngIf="lastPosition">
+        Current: {{lastPosition.lat.toFixed(4)}}, {{lastPosition.lng.toFixed(4)}}
+      </span>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="status" *ngIf="busId">
+    <h4>Status</h4>
+    <p>Bus ID: {{busId}}</p>
+    <p>Tracking: {{intervalId ? 'Active' : 'Stopped'}}</p>
+  </div>
+</div>
+
+<style>
+.live-tracking-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.header h1 {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.header p {
+  color: #666;
+  font-size: 18px;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: end;
+  padding: 20px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+
+.control-group label {
+  font-weight: bold;
+  color: #333;
+}
+
+.control-group input,
+.control-group select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.controls button {
+  padding: 12px 24px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.controls button:hover {
+  background: #0056b3;
+}
+
+.controls button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.map-container {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.map-container h3 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+#map {
+  height: 400px;
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.map-info {
+  margin-top: 15px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.map-info span {
+  color: #555;
+  font-size: 14px;
+}
+
+.status {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.status h4 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.status p {
+  margin-bottom: 8px;
+  color: #555;
+}
+
+@media (max-width: 768px) {
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .control-group {
+    width: 100%;
+  }
+  
+  .map-info {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  #map {
+    height: 300px;
+  }
+}
+</style>
