@@ -23,6 +23,7 @@ import { RouteDetailsComponent } from './Components/route-details/route-details.
 import { TrackingComponent } from './tracking/tracking.component';
 import { UserItineraryBrowserComponent } from './Components/user-itinerary-browser/user-itinerary-browser.component';
 import { UserItineraryBrowserrComponent } from './Components/user-itinerary-browserr/user-itinerary-browserr.component';
+import { LiveBusTrackingComponent } from './Components/live-bus-tracking/live-bus-tracking.component';
 
 export const routes: Routes = [
 
@@ -54,5 +55,8 @@ export const routes: Routes = [
   { path: "driver-tracking", component: DriverTrackingComponent },
 
   { path: "trackBus", component: TrackingComponent },
+
+  { path: "liveTracking", component: LiveBusTrackingComponent },
+
 
 ];

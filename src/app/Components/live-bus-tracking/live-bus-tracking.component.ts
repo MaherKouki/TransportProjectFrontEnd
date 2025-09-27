@@ -4,11 +4,14 @@ import { OnDestroy, OnInit } from '@angular/core'
 import * as L from 'leaflet'
 
 import { BusPosition } from '../../entity/busPosition'
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 
 @Component({
   selector: 'app-live-bus-tracking',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule , FormsModule],
   templateUrl: './live-bus-tracking.component.html',
   styleUrl: './live-bus-tracking.component.css'
 })
@@ -43,7 +46,7 @@ private map!: L.Map
     }).addTo(this.map)
 
     const busIcon = L.icon({
-      iconUrl: '/assets/bus6.jpg',
+      iconUrl: 'bus6.png',
       iconSize: [40, 40],
       iconAnchor: [20, 40],
     })

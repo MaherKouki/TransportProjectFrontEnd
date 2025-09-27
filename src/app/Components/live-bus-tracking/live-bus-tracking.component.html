@@ -1,1 +1,10 @@
 <p>live-bus-tracking works!</p>
+
+<div class="controls">
+  <label for="busId">Bus ID:</label>
+  <input id="busId" type="number" [(ngModel)]="busId" placeholder="Enter Bus ID" />
+  <button (click)="startTracking()">Start Tracking</button>
+</div>
+
+<div id="map"></div>
+
