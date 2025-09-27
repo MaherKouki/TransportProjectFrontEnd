@@ -10,7 +10,6 @@
 <div class="itinerary-list-container">
   <h1>Itinerary Management</h1>
   
-  <!-- Search Section -->
   <mat-card class="search-card">
     <mat-card-content>
       <div class="search-section">
@@ -34,13 +33,11 @@
     </mat-card-content>
   </mat-card>
 
-  <!-- Loading Spinner -->
   <div class="loading-container" *ngIf="loading">
     <mat-spinner></mat-spinner>
     <p>Loading itineraries...</p>
   </div>
 
-  <!-- Itineraries Grid -->
   <div class="itineraries-grid" *ngIf="!loading">
     <mat-card *ngFor="let itinerary of filteredItineraries" class="itinerary-card">
       <mat-card-header>
@@ -73,7 +70,6 @@
           </div>
         </div>
 
-        <!-- Intermediate Stops -->
         <div class="stops-section" *ngIf="itinerary.stops && itinerary.stops.length > 2">
           <h4>Intermediate Stops ({{itinerary.stops.length - 2}})</h4>
           <div class="stops-list">
@@ -85,7 +81,6 @@
           </div>
         </div>
 
-        <!-- Assigned Buses -->
         <div class="buses-section">
           <h4>Assigned Buses</h4>
           <div class="buses-list" *ngIf="itinerary.buses && itinerary.buses.length > 0; else noBuses">
@@ -101,7 +96,6 @@
           </ng-template>
         </div>
 
-        <!-- Bus Assignment -->
         <div class="assign-bus-section" *ngIf="getAvailableBuses(itinerary).length > 0">
           <mat-form-field appearance="outline">
             <mat-label>Assign Bus</mat-label>
@@ -134,7 +128,6 @@
     </mat-card>
   </div>
 
-  <!-- No Results -->
   <div class="no-results" *ngIf="!loading && filteredItineraries.length === 0">
     <mat-icon>route</mat-icon>
     <h3>No itineraries found</h3>

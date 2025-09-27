@@ -131,4 +131,17 @@ export class ItineraryService {
   AAAAAAAAaddStopsToItinerary(idItinerary: number, stops: Stop[]): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/add-stops/${idItinerary}`, stops)
   }
+
+
+
+  updateItinerary(id: number, updatedItinerary: Itinerary): Observable<Itinerary> {
+  return this.http.put<Itinerary>(`${this.baseUrl}/updateItinerary/${id}`, updatedItinerary);
+}
+
+// Delete itinerary
+deleteItinerary(id: number): Observable<string> {
+  return this.http.delete<string>(`${this.baseUrl}/deleteItinerary/${id}`);
+}
+
+
 }
