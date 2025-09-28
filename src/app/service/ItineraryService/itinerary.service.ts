@@ -138,9 +138,14 @@ export class ItineraryService {
   return this.http.put<Itinerary>(`${this.baseUrl}/updateItinerary/${id}`, updatedItinerary);
 }
 
-// Delete itinerary
 deleteItinerary(id: number): Observable<string> {
-  return this.http.delete<string>(`${this.baseUrl}/deleteItinerary/${id}`);
+  return this.http.delete(`${this.baseUrl}/deleteItinerary/${id}`, { responseType: 'text' });
+}
+
+
+
+getItineraryById(id: number): Observable<Itinerary> {
+  return this.http.get<Itinerary>(`${this.baseUrl}/getItineraryById/${id}`);
 }
 
 

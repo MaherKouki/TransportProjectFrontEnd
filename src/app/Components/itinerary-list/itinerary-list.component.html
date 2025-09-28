@@ -6,7 +6,7 @@
 
 
 
-
+<!-- 
 <div class="itinerary-list-container">
   <h1>Itinerary Management</h1>
   
@@ -138,4 +138,743 @@
       Create First Itinerary
     </button>
   </div>
+</div> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="user-itinerary-container">
+  <!-- Header -->
+  <div class="header-section">
+    <h2>Itinerary Management</h2>
+    <div class="workflow-steps">
+      <div class="step active">
+        <span class="step-number">1</span>
+        <span class="step-label">Manage Routes</span>
+      </div>
+      <div class="step">
+        <span class="step-number">2</span>
+        <span class="step-label">Assign Buses</span>
+      </div>
+      <div class="step">
+        <span class="step-number">3</span>
+        <span class="step-label">Track & Monitor</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Card -->
+  <mat-card class="search-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>search</mat-icon>
+        Search & Create Itineraries
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="search-container">
+        <mat-form-field appearance="fill" class="search-field">
+          <mat-label>Search itineraries</mat-label>
+          <input
+            matInput
+            [(ngModel)]="searchTerm"
+            placeholder="Search by name, departure, or destination..."
+          >
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+        
+        <button 
+          mat-raised-button 
+          color="primary" 
+          routerLink="/itinerary-map"
+          class="create-btn">
+          <mat-icon>add</mat-icon>
+          Create New
+        </button>
+        
+        <button 
+          mat-button 
+          color="accent"
+          (click)="loadItineraries()"
+          class="refresh-btn">
+          <mat-icon>refresh</mat-icon>
+          Refresh
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading itineraries...</p>
+  </div>
+
+  <!-- Itineraries List -->
+  <div class="itineraries-list" *ngIf="!loading && filteredItineraries.length > 0">
+    <mat-card *ngFor="let itinerary of filteredItineraries" class="itinerary-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>route</mat-icon>
+          {{itinerary.itineraryName || 'Unnamed Route'}}
+        </mat-card-title>
+        <mat-card-subtitle *ngIf="itinerary.startTime">
+          Start Time: {{itinerary.startTime}}
+        </mat-card-subtitle>
+        <div class="header-actions">
+          <button mat-icon-button color="primary" (click)="editItinerary(itinerary)" class="edit-btn">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteItinerary(itinerary)" class="delete-btn">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <!-- Route Info -->
+        <div class="route-section">
+          <div class="route-point departure">
+            <div class="point-icon">
+              <mat-icon>place</mat-icon>
+            </div>
+            <div class="point-info">
+              <h4>From</h4>
+              <p>{{itinerary.departure?.stopName || 'Not set'}}</p>
+              <small *ngIf="itinerary.departure?.latitude && itinerary.departure?.longitude">
+                {{itinerary.departure?.latitude}}, {{itinerary.departure?.longitude}}
+              </small>
+            </div>
+          </div>
+          
+          <div class="route-line">
+            <mat-icon class="route-arrow">arrow_downward</mat-icon>
+          </div>
+          
+          <div class="route-point destination">
+            <div class="point-icon">
+              <mat-icon>flag</mat-icon>
+            </div>
+            <div class="point-info">
+              <h4>To</h4>
+              <p>{{itinerary.destination?.stopName || 'Not set'}}</p>
+              <small *ngIf="itinerary.destination?.latitude && itinerary.destination?.longitude">
+                {{itinerary.destination?.latitude}}, {{itinerary.destination?.longitude}}
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Itinerary Info -->
+        <div class="itinerary-info">
+          <div class="info-item">
+            <mat-icon>directions_bus</mat-icon>
+            <span>{{ itinerary.buses?.length || 0 }} bus(es)</span>
+          </div>
+          <div class="info-item">
+            <mat-icon>location_on</mat-icon>
+            <span>{{ itinerary.stops?.length || 0 }} stops</span>
+          </div>
+          <div class="info-item" *ngIf="itinerary.startTime">
+            <mat-icon>schedule</mat-icon>
+            <span>Starts: {{ itinerary.startTime }}</span>
+          </div>
+        </div>
+
+        <!-- Intermediate Stops -->
+        <div class="stops-section" *ngIf="itinerary.stops && itinerary.stops.length > 2">
+          <h4>Intermediate Stops ({{itinerary.stops.length - 2}})</h4>
+          <div class="stops-list">
+            <mat-chip-set>
+              <mat-chip *ngFor="let stop of itinerary.stops.slice(1, -1)">
+                {{stop.stopName}}
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+        </div>
+
+        <!-- Assigned Buses -->
+        <div class="buses-section">
+          <h4>Assigned Buses</h4>
+          <div class="buses-list" *ngIf="itinerary.buses && itinerary.buses.length > 0; else noBuses">
+            <div class="bus-item" *ngFor="let bus of itinerary.buses">
+              <div class="bus-info">
+                <mat-icon>directions_bus</mat-icon>
+                <div class="bus-details-header">
+                  <span class="bus-name">{{ bus.matricule }}</span>
+                  <div class="bus-metadata">
+                    <span class="bus-brand">{{ bus.marque }}</span>
+                    <span class="bus-id">ID: {{ bus.idBus }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ng-template #noBuses>
+            <div class="no-buses">
+              <mat-icon>info</mat-icon>
+              <span>No buses assigned</span>
+            </div>
+          </ng-template>
+        </div>
+
+        <!-- Bus Assignment -->
+        <div class="assign-bus-section" *ngIf="getAvailableBuses(itinerary).length > 0">
+          <mat-form-field appearance="outline" class="bus-select">
+            <mat-label>Assign Bus</mat-label>
+            <mat-select #busSelect>
+              <mat-option *ngFor="let bus of getAvailableBuses(itinerary)" [value]="bus.idBus">
+                {{bus.matricule}} - {{bus.marque}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <button mat-raised-button color="primary" 
+                  (click)="assignBusToItinerary(itinerary.idItinerary!, busSelect.value)"
+                  [disabled]="!busSelect.value"
+                  class="assign-btn">
+            <mat-icon>add</mat-icon>
+            Assign
+          </button>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-button color="primary" routerLink="/bus-tracking" 
+                [queryParams]="{itinerary: itinerary.idItinerary}">
+          <mat-icon>gps_fixed</mat-icon>
+          Track Buses
+        </button>
+        <button mat-button color="accent" (click)="editItinerary(itinerary)">
+          <mat-icon>edit</mat-icon>
+          Edit Route
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- Empty States -->
+  <div class="empty-state" *ngIf="!loading && filteredItineraries.length === 0">
+    <mat-icon>route</mat-icon>
+    <h3>{{searchTerm ? 'No results found' : 'No itineraries yet'}}</h3>
+    <p *ngIf="searchTerm">
+      No itineraries match your search "{{searchTerm}}". Try different keywords.
+    </p>
+    <p *ngIf="!searchTerm">
+      Create your first itinerary to start managing bus routes.
+    </p>
+    <button mat-raised-button color="primary" routerLink="/itinerary-form">
+      <mat-icon>add</mat-icon>
+      Create Itinerary
+    </button>
+    <button mat-button (click)="searchTerm = ''" *ngIf="searchTerm">
+      <mat-icon>clear</mat-icon>
+      Clear Search
+    </button>
+  </div>
 </div>
+
+<style>
+.user-itinerary-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  font-family: 'Roboto', 'Helvetica Neue', sans-serif;
+}
+
+/* Header Section */
+.header-section {
+  margin-bottom: 24px;
+}
+
+.header-section h2 {
+  text-align: center;
+  color: #1976d2;
+  margin-bottom: 20px;
+  font-size: 28px;
+  font-weight: 500;
+}
+
+.workflow-steps {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  border-radius: 12px;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  min-width: 120px;
+  opacity: 0.6;
+}
+
+.step.active {
+  background-color: #e3f2fd;
+  border: 2px solid #1976d2;
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #ccc;
+  color: white;
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.step.active .step-number {
+  background-color: #1976d2;
+}
+
+.step-label {
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  color: #666;
+}
+
+.step.active .step-label {
+  color: #333;
+  font-weight: 600;
+}
+
+/* Card Styles */
+mat-card {
+  margin-bottom: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+mat-card:hover {
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+mat-card-header {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  margin: -24px -24px 20px -24px;
+  padding: 20px 24px;
+  border-bottom: 1px solid #dee2e6;
+  position: relative;
+}
+
+mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #1976d2;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+mat-card-subtitle {
+  color: #666;
+  margin-top: 4px;
+}
+
+.header-actions {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  display: flex;
+  gap: 8px;
+}
+
+.edit-btn:hover {
+  background-color: rgba(25, 118, 210, 0.1);
+}
+
+.delete-btn:hover {
+  background-color: rgba(244, 67, 54, 0.1);
+}
+
+/* Search Section */
+.search-container {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.search-field {
+  flex: 1;
+  min-width: 300px;
+}
+
+.create-btn, .refresh-btn {
+  margin-top: 8px;
+}
+
+/* Loading */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  gap: 16px;
+  color: #666;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Route Section */
+.route-section {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+  border-radius: 8px;
+  border-left: 4px solid #1976d2;
+}
+
+.route-point {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.route-point:last-child {
+  margin-bottom: 0;
+}
+
+.point-icon {
+  background: #e3f2fd;
+  padding: 8px;
+  border-radius: 50%;
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.departure .point-icon {
+  background: #e8f5e8;
+}
+
+.destination .point-icon {
+  background: #ffebee;
+}
+
+.point-info h4 {
+  margin: 0 0 4px 0;
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.point-info p {
+  margin: 0 0 2px 0;
+  color: #495057;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.point-info small {
+  color: #6c757d;
+  font-size: 12px;
+}
+
+.route-line {
+  display: flex;
+  justify-content: center;
+  margin: 8px 0;
+}
+
+.route-arrow {
+  color: #6c757d;
+  font-size: 20px;
+}
+
+/* Itinerary Info */
+.itinerary-info {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #666;
+  background-color: #f8f9fa;
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid #e9ecef;
+}
+
+.info-item mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: #1976d2;
+}
+
+/* Stops Section */
+.stops-section {
+  margin: 16px 0;
+  padding: 12px;
+  background: #fafbfc;
+  border-radius: 6px;
+}
+
+.stops-section h4 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #495057;
+  font-weight: 600;
+}
+
+/* Buses Section */
+.buses-section {
+  margin: 16px 0;
+}
+
+.buses-section h4 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: #333;
+  font-weight: 600;
+}
+
+.bus-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+  border-radius: 8px;
+  border-left: 3px solid #28a745;
+  margin-bottom: 8px;
+}
+
+.bus-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bus-info mat-icon {
+  color: #28a745;
+}
+
+.bus-details-header {
+  display: flex;
+  flex-direction: column;
+}
+
+.bus-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 16px;
+}
+
+.bus-metadata {
+  display: flex;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.bus-id, .bus-brand {
+  font-size: 12px;
+  color: #666;
+}
+
+.no-buses {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #6c757d;
+  font-style: italic;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+/* Bus Assignment */
+.assign-bus-section {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+  margin-top: 16px;
+}
+
+.bus-select {
+  flex: 1;
+}
+
+.assign-btn {
+  height: 48px;
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 40px;
+  text-align: center;
+  color: #666;
+  background-color: white;
+  border-radius: 12px;
+  margin: 40px 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.empty-state mat-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  color: #ccc;
+  margin-bottom: 20px;
+}
+
+.empty-state h3 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.empty-state p {
+  margin: 6px 0;
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+.empty-state button {
+  margin: 8px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .user-itinerary-container {
+    padding: 16px;
+  }
+  
+  .header-section h2 {
+    font-size: 24px;
+  }
+  
+  .workflow-steps {
+    gap: 12px;
+  }
+  
+  .step {
+    min-width: 90px;
+    padding: 12px;
+  }
+  
+  .search-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-field {
+    min-width: auto;
+  }
+  
+  .create-btn, .refresh-btn {
+    margin-top: 0;
+  }
+  
+  .header-actions {
+    position: static;
+    margin-top: 12px;
+    justify-content: flex-end;
+  }
+  
+  .itinerary-info {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .assign-bus-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-itinerary-container {
+    padding: 12px;
+  }
+  
+  .workflow-steps {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .step {
+    width: 100%;
+    flex-direction: row;
+    text-align: left;
+    padding: 12px 16px;
+  }
+  
+  .step-number {
+    margin-bottom: 0;
+    margin-right: 12px;
+  }
+  
+  mat-card-header {
+    padding: 16px;
+  }
+  
+  mat-card-title {
+    font-size: 16px;
+  }
+  
+  .empty-state {
+    padding: 40px 20px;
+  }
+  
+  .empty-state mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+  }
+  
+  .empty-state h3 {
+    font-size: 20px;
+  }
+}
+</style>

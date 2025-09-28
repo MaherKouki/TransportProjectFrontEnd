@@ -177,3 +177,177 @@
 
 
 
+import { Component, OnInit } from "@angular/core"
+import { Router } from "@angular/router"
+import { Itinerary } from "../../entity/itinerary"
+import { Bus } from "../../entity/bus"
+import { ItineraryService } from "../../service/ItineraryService/itinerary.service"
+import { BusService } from "../../service/BusService/bus.service"
+import { MatSnackBar } from "@angular/material/snack-bar"
+import { CommonModule } from "@angular/common"
+import { FormsModule, ReactiveFormsModule } from "@angular/forms"
+import { MatCardModule } from "@angular/material/card"
+import { MatFormFieldModule } from "@angular/material/form-field"
+import { MatInputModule } from "@angular/material/input"
+import { MatButtonModule } from "@angular/material/button"
+import { MatIconModule } from "@angular/material/icon"
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner"
+import { MatChipsModule } from "@angular/material/chips"
+import { MatSelectModule } from "@angular/material/select"
+import { RouterModule } from "@angular/router"
+
+@Component({
+  selector: "app-itinerary-list",
+  templateUrl: "./itinerary-list.component.html",
+  styleUrls: ["./itinerary-list.component.css"],
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatChipsModule,
+    MatSelectModule,
+    RouterModule
+  ]
+})
+export class ItineraryListComponent implements OnInit {
+  itineraries: Itinerary[] = []
+  buses: Bus[] = []
+  loading = false
+  searchTerm = ""
+  
+  constructor(
+    private itineraryService: ItineraryService,
+    private busService: BusService,
+    private snackBar: MatSnackBar,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    this.loadItineraries()
+    this.loadBuses()
+  }
+
+  loadItineraries(): void {
+    this.loading = true
+    this.itineraryService.getAllItineraries().subscribe({
+      next: (itineraries) => {
+        this.itineraries = itineraries
+        this.loading = false
+      },
+      error: (error) => {
+        console.error("Error loading itineraries:", error)
+        this.snackBar.open("Error loading itineraries", "Close", { duration: 3000 })
+        this.loading = false
+      }
+    })
+  }
+
+  loadBuses(): void {
+    this.busService.getAllBuses().subscribe({
+      next: (buses) => {
+        this.buses = buses
+      },
+      error: (error) => {
+        console.error("Error loading buses:", error)
+      }
+    })
+  }
+
+  get filteredItineraries(): Itinerary[] {
+    if (!this.searchTerm) {
+      return this.itineraries
+    }
+
+    return this.itineraries.filter(
+      (itinerary) =>
+        itinerary.itineraryName?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        itinerary.departure?.stopName?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        itinerary.destination?.stopName?.toLowerCase().includes(this.searchTerm.toLowerCase())
+    )
+  }
+
+  assignBusToItinerary(itineraryId: number, busId: number): void {
+    this.busService.affectItineraryToBus(busId, itineraryId).subscribe({
+      next: () => {
+        this.snackBar.open("Bus assigned successfully", "Close", { duration: 3000 })
+        this.loadItineraries()
+      },
+      error: (error) => {
+        console.error("Error assigning bus:", error)
+        this.snackBar.open("Error assigning bus to itinerary", "Close", { duration: 3000 })
+      }
+    })
+  }
+
+  editItinerary(itinerary: Itinerary): void {
+    this.router.navigate(['/update-itinerary', itinerary.idItinerary])
+  }
+
+  // deleteItinerary(itinerary: Itinerary): void {
+  //   const confirmMessage = `Are you sure you want to delete "${itinerary.itineraryName}"?\n\nThis action cannot be undone and will remove:\n- ${itinerary.buses?.length || 0} assigned bus(es)\n- ${itinerary.stops?.length || 0} route stops\n- All related tracking data`
+    
+  //   if (confirm(confirmMessage)) {
+  //     this.itineraryService.deleteItinerary(itinerary.idItinerary!).subscribe({
+  //       next: () => {
+  //         this.snackBar.open("Itinerary deleted successfully", "Close", { duration: 3000 })
+  //         this.loadItineraries()
+  //       },
+  //       error: (error) => {
+  //         console.error("Error deleting itinerary:", error)
+  //         this.snackBar.open("Error deleting itinerary. Please try again.", "Close", { duration: 3000 })
+  //       }
+  //     })
+  //   }
+  // }
+
+
+
+  deleteItinerary(itinerary: Itinerary): void {
+  const confirmMessage = `Are you sure you want to delete "${itinerary.itineraryName}"?\n\nThis action cannot be undone.`;
+
+  if (confirm(confirmMessage)) {
+    this.itineraryService.deleteItinerary(itinerary.idItinerary!).subscribe({
+      next: (message) => {
+        console.log(message); // "Itinerary deleted successfully"
+        this.snackBar.open(message, "Close", { duration: 3000 });
+
+        // Update the list locally without reloading
+        this.itineraries = this.itineraries.filter(i => i.idItinerary !== itinerary.idItinerary);
+      },
+      error: (error) => {
+        console.error("Error deleting itinerary:", error);
+        this.snackBar.open("Error deleting itinerary. Please try again.", "Close", { duration: 3000 });
+      }
+    });
+  }
+}
+
+
+
+
+
+  getAvailableBuses(itinerary: Itinerary): Bus[] {
+    const assignedBusIds = itinerary.buses?.map((bus) => bus.idBus) || []
+    return this.buses.filter((bus) => !assignedBusIds.includes(bus.idBus))
+  }
+
+  // Helper methods for display
+  getItineraryDisplayName(itinerary: Itinerary): string {
+    return itinerary.itineraryName || `Route ${itinerary.idItinerary || 'Unknown'}`
+  }
+
+  getStopDisplayName(stop: any): string {
+    return stop?.stopName || `Stop ${stop?.idStop || 'Unknown'}`
+  }
+
+  getBusDisplayName(bus: Bus): string {
+    return bus.matricule || `Bus ${bus.idBus}`
+  }
+}

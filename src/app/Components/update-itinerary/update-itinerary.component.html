@@ -1,0 +1,241 @@
+<p>update-itinerary works!</p>
+
+
+
+<div class="user-itinerary-container">
+  <!-- Header -->
+  <div class="header-section">
+    <h2>Update Itinerary</h2>
+    <div class="workflow-steps">
+      <div class="step active">
+        <span class="step-number">1</span>
+        <span class="step-label">Edit Details</span>
+      </div>
+      <div class="step">
+        <span class="step-number">2</span>
+        <span class="step-label">Update Route</span>
+      </div>
+      <div class="step">
+        <span class="step-number">3</span>
+        <span class="step-label">Save Changes</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading itinerary data...</p>
+  </div>
+
+  <!-- Update Form -->
+  <form [formGroup]="updateForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+    
+    <!-- Basic Information Card -->
+    <mat-card class="search-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>edit</mat-icon>
+          Itinerary Information
+        </mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <div class="form-row">
+          <mat-form-field appearance="fill" class="form-field">
+            <mat-label>Itinerary Name</mat-label>
+            <input
+              matInput
+              formControlName="itineraryName"
+              placeholder="Enter route name..."
+            >
+            <mat-icon matSuffix>route</mat-icon>
+            <mat-error *ngIf="updateForm.get('itineraryName')?.hasError('required')">
+              Itinerary name is required
+            </mat-error>
+            <mat-error *ngIf="updateForm.get('itineraryName')?.hasError('minlength')">
+              Name must be at least 3 characters
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" class="form-field">
+            <mat-label>Start Time</mat-label>
+            <input
+              matInput
+              formControlName="startTime"
+              placeholder="e.g., 06:00"
+            >
+            <mat-icon matSuffix>schedule</mat-icon>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Route Selection Card -->
+    <mat-card class="search-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>place</mat-icon>
+          Route Configuration
+        </mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <!-- Departure Stop -->
+        <div class="route-section">
+          <div class="route-point departure">
+            <div class="point-icon">
+              <mat-icon>place</mat-icon>
+            </div>
+            <div class="point-form">
+              <h4>Departure Stop</h4>
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Search departure stop</mat-label>
+                <input
+                  matInput
+                  formControlName="departureStopName"
+                  (input)="onDepartureInput()"
+                  placeholder="e.g., Central Station..."
+                >
+                <mat-icon matSuffix>search</mat-icon>
+                <mat-error *ngIf="updateForm.get('departureStopName')?.hasError('required')">
+                  Departure stop is required
+                </mat-error>
+              </mat-form-field>
+              
+              <!-- Departure Suggestions -->
+              <div class="suggestions-container" *ngIf="filteredDepartureStops.length > 0 && updateForm.get('departureStopName')?.value">
+                <div class="suggestion-item" 
+                     *ngFor="let stop of filteredDepartureStops.slice(0, 5)" 
+                     (click)="selectDepartureStop(stop)">
+                  <mat-icon>location_on</mat-icon>
+                  <span>{{ getStopDisplayName(stop) }}</span>
+                  <small class="stop-order" *ngIf="stop.orderIndex">Order: {{ stop.orderIndex }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="route-line">
+            <mat-icon class="route-arrow">arrow_downward</mat-icon>
+          </div>
+          
+          <!-- Destination Stop -->
+          <div class="route-point destination">
+            <div class="point-icon">
+              <mat-icon>flag</mat-icon>
+            </div>
+            <div class="point-form">
+              <h4>Destination Stop</h4>
+              <mat-form-field appearance="fill" class="form-field">
+                <mat-label>Search destination stop</mat-label>
+                <input
+                  matInput
+                  formControlName="destinationStopName"
+                  (input)="onDestinationInput()"
+                  placeholder="e.g., Airport Terminal..."
+                >
+                <mat-icon matSuffix>search</mat-icon>
+                <mat-error *ngIf="updateForm.get('destinationStopName')?.hasError('required')">
+                  Destination stop is required
+                </mat-error>
+              </mat-form-field>
+              
+              <!-- Destination Suggestions -->
+              <div class="suggestions-container" *ngIf="filteredDestinationStops.length > 0 && updateForm.get('destinationStopName')?.value">
+                <div class="suggestion-item" 
+                     *ngFor="let stop of filteredDestinationStops.slice(0, 5)" 
+                     (click)="selectDestinationStop(stop)">
+                  <mat-icon>location_on</mat-icon>
+                  <span>{{ getStopDisplayName(stop) }}</span>
+                  <small class="stop-order" *ngIf="stop.orderIndex">Order: {{ stop.orderIndex }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Current Itinerary Info -->
+    <mat-card class="info-card" *ngIf="currentItinerary">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>info</mat-icon>
+          Current Itinerary Details
+        </mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <div class="itinerary-info">
+          <div class="info-item">
+            <mat-icon>directions_bus</mat-icon>
+            <span>{{ currentItinerary.buses?.length || 0 }} assigned bus(es)</span>
+          </div>
+          <div class="info-item">
+            <mat-icon>location_on</mat-icon>
+            <span>{{ currentItinerary.stops?.length || 0 }} total stops</span>
+          </div>
+          <div class="info-item" *ngIf="currentItinerary.idItinerary">
+            <mat-icon>tag</mat-icon>
+            <span>ID: {{ currentItinerary.idItinerary }}</span>
+          </div>
+        </div>
+
+        <!-- Assigned Buses Display -->
+        <div class="buses-section" *ngIf="currentItinerary.buses && currentItinerary.buses.length > 0">
+          <h4>Currently Assigned Buses</h4>
+          <div class="buses-list">
+            <div class="bus-item" *ngFor="let bus of currentItinerary.buses">
+              <div class="bus-info">
+                <mat-icon>directions_bus</mat-icon>
+                <div class="bus-details-header">
+                  <span class="bus-name">{{ bus.matricule }}</span>
+                  <div class="bus-metadata">
+                    <span class="bus-brand">{{ bus.marque }}</span>
+                    <span class="bus-id">ID: {{ bus.idBus }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Action Buttons -->
+    <div class="action-section">
+      <div class="action-buttons">
+        <button 
+          mat-button 
+          color="warn"
+          type="button"
+          (click)="cancel()">
+          <mat-icon>cancel</mat-icon>
+          Cancel
+        </button>
+        
+        <button 
+          mat-raised-button 
+          color="primary"
+          type="submit"
+          [disabled]="updateForm.invalid || saving">
+          <mat-spinner diameter="20" *ngIf="saving"></mat-spinner>
+          <mat-icon *ngIf="!saving">save</mat-icon>
+          {{ saving ? 'Updating...' : 'Update Itinerary' }}
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Error State -->
+  <div class="empty-state" *ngIf="!loading && !currentItinerary">
+    <mat-icon>error</mat-icon>
+    <h3>Itinerary Not Found</h3>
+    <p>The requested itinerary could not be loaded.</p>
+    <button mat-raised-button color="primary" (click)="cancel()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to List
+    </button>
+  </div>
+</div>
