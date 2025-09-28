@@ -3,7 +3,6 @@
 
 
 <div class="user-itinerary-container">
-  <!-- Header -->
   <div class="header-section">
     <h2>Update Itinerary</h2>
     <div class="workflow-steps">
@@ -22,16 +21,13 @@
     </div>
   </div>
 
-  <!-- Loading -->
   <div class="loading-container" *ngIf="loading">
     <mat-spinner diameter="40"></mat-spinner>
     <p>Loading itinerary data...</p>
   </div>
 
-  <!-- Update Form -->
   <form [formGroup]="updateForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
     
-    <!-- Basic Information Card -->
     <mat-card class="search-card">
       <mat-card-header>
         <mat-card-title>
@@ -71,7 +67,6 @@
       </mat-card-content>
     </mat-card>
 
-    <!-- Route Selection Card -->
     <mat-card class="search-card">
       <mat-card-header>
         <mat-card-title>
@@ -81,7 +76,6 @@
       </mat-card-header>
       
       <mat-card-content>
-        <!-- Departure Stop -->
         <div class="route-section">
           <div class="route-point departure">
             <div class="point-icon">
@@ -103,7 +97,6 @@
                 </mat-error>
               </mat-form-field>
               
-              <!-- Departure Suggestions -->
               <div class="suggestions-container" *ngIf="filteredDepartureStops.length > 0 && updateForm.get('departureStopName')?.value">
                 <div class="suggestion-item" 
                      *ngFor="let stop of filteredDepartureStops.slice(0, 5)" 
@@ -120,7 +113,6 @@
             <mat-icon class="route-arrow">arrow_downward</mat-icon>
           </div>
           
-          <!-- Destination Stop -->
           <div class="route-point destination">
             <div class="point-icon">
               <mat-icon>flag</mat-icon>
@@ -141,7 +133,6 @@
                 </mat-error>
               </mat-form-field>
               
-              <!-- Destination Suggestions -->
               <div class="suggestions-container" *ngIf="filteredDestinationStops.length > 0 && updateForm.get('destinationStopName')?.value">
                 <div class="suggestion-item" 
                      *ngFor="let stop of filteredDestinationStops.slice(0, 5)" 
@@ -157,7 +148,6 @@
       </mat-card-content>
     </mat-card>
 
-    <!-- Current Itinerary Info -->
     <mat-card class="info-card" *ngIf="currentItinerary">
       <mat-card-header>
         <mat-card-title>
@@ -182,7 +172,6 @@
           </div>
         </div>
 
-        <!-- Assigned Buses Display -->
         <div class="buses-section" *ngIf="currentItinerary.buses && currentItinerary.buses.length > 0">
           <h4>Currently Assigned Buses</h4>
           <div class="buses-list">
@@ -203,7 +192,6 @@
       </mat-card-content>
     </mat-card>
 
-    <!-- Action Buttons -->
     <div class="action-section">
       <div class="action-buttons">
         <button 
@@ -228,7 +216,6 @@
     </div>
   </form>
 
-  <!-- Error State -->
   <div class="empty-state" *ngIf="!loading && !currentItinerary">
     <mat-icon>error</mat-icon>
     <h3>Itinerary Not Found</h3>
