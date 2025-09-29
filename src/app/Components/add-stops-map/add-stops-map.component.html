@@ -1,5 +1,6 @@
 <!-- <p>add-stops-map works!</p> -->
 
+<!-- 
 <div class="map-container">
   <div class="controls-panel">
     <div class="header">
@@ -75,6 +76,158 @@
         <li>Use the ❌ button to remove individual stops</li>
         <li>Click "Add Stops" to save all selected stops to the itinerary</li>
       </ol>
+    </div>
+  </div>
+
+  <div id="map" class="map"></div>
+</div> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <p>add-stops-map works!</p> -->
+
+
+
+<div class="map-container">
+  <div class="controls-panel">
+    <div class="header">
+      <h2>📍 Add Stops to Itinerary</h2>
+      <p class="subtitle" *ngIf="currentItinerary">Adding stops to: <strong>{{ currentItinerary.itineraryName }}</strong></p>
+      <p class="subtitle" *ngIf="!currentItinerary">Click on the map to add multiple stops</p>
+    </div>
+
+    <!-- Back to Update Button -->
+    <div class="navigation-section">
+      <button class="back-btn" (click)="backToUpdate()" [disabled]="isLoading">
+        ⬅️ Back to Update Itinerary
+      </button>
+    </div>
+
+    <!-- Itinerary Info -->
+    <div class="itinerary-info" *ngIf="currentItinerary">
+      <div class="info-card">
+        <h4>📊 Current Route Info</h4>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Existing Stops:</span>
+            <span class="info-value">{{ currentItinerary.stops?.length || 0 }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Departure:</span>
+            <span class="info-value">{{ currentItinerary.departure?.stopName || 'Not set' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Destination:</span>
+            <span class="info-value">{{ currentItinerary.destination?.stopName || 'Not set' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-indicator">
+      <span class="step-label">New Stops Selected:</span>
+      <div class="step-badge">
+        {{selectedStops.length}} stop(s) selected
+      </div>
+    </div>
+
+    <div class="selected-stops">
+      <div *ngFor="let stop of selectedStops; let i = index" class="stop-card">
+        <div class="stop-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="stop-icon">🚩</span>
+            <strong>New Stop {{i + 1}}</strong>
+          </div>
+          <button 
+            class="remove-btn"
+            (click)="removeStop(i)"
+            [disabled]="isLoading"
+            title="Remove stop">
+            ❌
+          </button>
+        </div>
+        <div class="stop-content">
+          <input 
+            class="stop-name-input"
+            [(ngModel)]="stop.stopName"
+            (blur)="updateStopName(i, stop.stopName)"
+            placeholder="Edit stop name...">
+          <div class="coordinates">
+            Lat: {{stop.latitude | number:'1.4-4'}}, Lng: {{stop.longitude | number:'1.4-4'}}
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="selectedStops.length === 0" class="no-stops">
+        <p>No new stops selected yet. Click on the map to add stops.</p>
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <button 
+        class="submit-btn"
+        [disabled]="!canSubmit()"
+        (click)="submitStops()">
+        <span *ngIf="!isLoading">✨ Add {{selectedStops.length}} Stop(s)</span>
+        <span *ngIf="isLoading">⏳ Adding stops to itinerary...</span>
+      </button>
+      
+      <button 
+        class="reset-btn"
+        (click)="reset()"
+        [disabled]="isLoading">
+        🔄 Clear New Stops
+      </button>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+      <strong>❌ Error:</strong>
+      <p>{{errorMessage}}</p>
+      <button class="dismiss-btn" (click)="dismissError()">
+        Dismiss
+      </button>
+    </div>
+
+    <div class="instructions">
+      <h4>📋 Instructions:</h4>
+      <ol>
+        <li><strong>Green markers</strong> show existing stops in the route</li>
+        <li><strong>Blue markers</strong> are new stops you're adding</li>
+        <li>Click anywhere on the map to add a new stop</li>
+        <li>Edit stop names by clicking in the input field</li>
+        <li>Use the ❌ button to remove individual stops</li>
+        <li>Click "Add Stops" to save all new stops to the itinerary</li>
+      </ol>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <h4>🗺️ Map Legend:</h4>
+      <div class="legend-item">
+        <div class="legend-marker existing"></div>
+        <span>Existing stops</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-marker new"></div>
+        <span>New stops to add</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-line"></div>
+        <span>Current route</span>
+      </div>
     </div>
   </div>
 

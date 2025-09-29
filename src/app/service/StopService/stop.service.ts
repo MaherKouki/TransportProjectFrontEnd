@@ -1,31 +1,3 @@
-// import { HttpClient } from '@angular/common/http';
-// import { Injectable } from '@angular/core';
-// import { Bus } from '../../entity/bus';
-// import { Observable } from 'rxjs';
-// import { Stop } from '../../entity/stop';
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class StopService {
-
-//     private baseUrl = 'http://localhost:8080/stops'; // adapte selon ton backend
-
-//   constructor(private http: HttpClient) {}
-
-//   // Créer un stop
-//   createStop(stop: Stop): Observable<Stop> {
-//     return this.http.post<Stop>(`${this.baseUrl}/stop`, stop);
-//   }
-// }
-
-
-
-
-
-
-
-
 
 import { HttpClient } from "@angular/common/http"
 import { Injectable } from "@angular/core"
@@ -52,7 +24,16 @@ export class StopService {
     return this.http.put<Stop>(`${this.baseUrl}/updateStop/${stopId}`, stop)
   }
 
-  deleteStop(stopId: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/deleteStop/${stopId}`)
+  
+  deleteStop(stopId: number): Observable<string> {
+    return this.http.delete(`${this.baseUrl}/deleteStop/${stopId}`, { 
+      responseType: 'text' 
+    })
   }
+
+
+  getStopById(stopId: number): Observable<Stop> {
+  return this.http.get<Stop>(`${this.baseUrl}/stop/${stopId}`);
+}
+
 }

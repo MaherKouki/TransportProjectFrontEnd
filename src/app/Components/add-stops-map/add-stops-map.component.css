@@ -5,7 +5,7 @@
 }
 
 .controls-panel {
-  width: 350px;
+  width: 380px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   padding: 20px;
@@ -15,19 +15,92 @@
 
 .header {
   text-align: center;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
 }
 
 .header h2 {
   margin: 0 0 8px 0;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
 }
 
 .subtitle {
   margin: 0;
   opacity: 0.9;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* Navigation Section */
+.navigation-section {
+  margin-bottom: 20px;
+}
+
+.back-btn {
+  width: 100%;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 8px;
+  color: white;
   font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.back-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Itinerary Info Section */
+.itinerary-info {
+  margin-bottom: 20px;
+}
+
+.info-card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 15px;
+  backdrop-filter: blur(10px);
+}
+
+.info-card h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+
+.info-label {
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+.info-value {
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
 }
 
 .step-indicator {
@@ -55,8 +128,8 @@
 }
 
 .selected-stops {
-  margin-bottom: 25px;
-  max-height: 300px;
+  margin-bottom: 20px;
+  max-height: 250px;
   overflow-y: auto;
 }
 
@@ -107,24 +180,45 @@
   line-height: 1.4;
 }
 
+.stop-name-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 8px;
+  color: white;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.stop-name-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.stop-name-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
 .coordinates {
   font-size: 11px;
   opacity: 0.7;
-  margin-top: 4px;
 }
 
 .no-stops {
   text-align: center;
-  padding: 32px 0;
+  padding: 24px 0;
   opacity: 0.8;
   font-style: italic;
+  font-size: 13px;
 }
 
 .action-buttons {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
 }
 
 .submit-btn,
@@ -200,6 +294,7 @@
   background: rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   padding: 15px;
+  margin-bottom: 15px;
   backdrop-filter: blur(10px);
 }
 
@@ -219,6 +314,54 @@
   margin-bottom: 4px;
 }
 
+/* Legend */
+.legend {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 15px;
+  backdrop-filter: blur(10px);
+}
+
+.legend h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.legend-item:last-child {
+  margin-bottom: 0;
+}
+
+.legend-marker {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.legend-marker.existing {
+  background-color: #10b981;
+}
+
+.legend-marker.new {
+  background-color: #3b82f6;
+}
+
+.legend-line {
+  width: 30px;
+  height: 3px;
+  background-color: #10b981;
+  border-radius: 2px;
+}
+
 .map {
   flex: 1;
   height: 100%;
@@ -233,4 +376,64 @@
 .leaflet-popup-content {
   margin: 12px 16px;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Custom marker styles */
+.existing-stop-icon {
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.new-stop-icon {
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .controls-panel {
+    width: 100%;
+    height: 40vh;
+  }
+  
+  .map-container {
+    flex-direction: column;
+  }
+  
+  .map {
+    height: 60vh;
+  }
+  
+  .header h2 {
+    font-size: 20px;
+  }
+  
+  .subtitle {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .controls-panel {
+    padding: 15px;
+    height: 45vh;
+  }
+  
+  .map {
+    height: 55vh;
+  }
+  
+  .header h2 {
+    font-size: 18px;
+  }
+  
+  .selected-stops {
+    max-height: 150px;
+  }
+  
+  .info-grid {
+    gap: 6px;
+  }
+  
+  .info-item {
+    font-size: 11px;
+  }
 }
