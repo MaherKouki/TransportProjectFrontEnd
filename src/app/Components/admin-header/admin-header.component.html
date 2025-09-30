@@ -1,0 +1,67 @@
+<p>admin-header works!</p>
+<mat-toolbar color="primary" class="admin-toolbar">
+  <div class="toolbar-content">
+    <div class="brand-section">
+      <mat-icon class="brand-icon">admin_panel_settings</mat-icon>
+      <span class="brand-name">Admin Panel</span>
+    </div>
+    
+    <nav class="nav-links">
+      <button mat-button routerLink="/dashboard" routerLinkActive="active-link">
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashboard</span>
+      </button>
+      
+      <button mat-button [matMenuTriggerFor]="busMenu">
+        <mat-icon>directions_bus</mat-icon>
+        <span>Buses</span>
+        <mat-icon class="dropdown-icon">arrow_drop_down</mat-icon>
+      </button>
+      <mat-menu #busMenu="matMenu">
+        <button mat-menu-item routerLink="/buses">
+          <mat-icon>list</mat-icon>
+          <span>All Buses</span>
+        </button>
+        <button mat-menu-item routerLink="/bus-tracking">
+          <mat-icon>gps_fixed</mat-icon>
+          <span>Track Buses</span>
+        </button>
+        <button mat-menu-item routerLink="/trackBus">
+          <mat-icon>track_changes</mat-icon>
+          <span>Live Tracking</span>
+        </button>
+      </mat-menu>
+      
+      <button mat-button [matMenuTriggerFor]="routeMenu">
+        <mat-icon>route</mat-icon>
+        <span>Routes</span>
+        <mat-icon class="dropdown-icon">arrow_drop_down</mat-icon>
+      </button>
+      <mat-menu #routeMenu="matMenu">
+        <button mat-menu-item routerLink="/itineraries">
+          <mat-icon>list</mat-icon>
+          <span>Manage Routes</span>
+        </button>
+        <button mat-menu-item routerLink="/itinerary-form">
+          <mat-icon>add</mat-icon>
+          <span>Create Route</span>
+        </button>
+        <button mat-menu-item routerLink="/itinerary-map">
+          <mat-icon>map</mat-icon>
+          <span>Route Map</span>
+        </button>
+      </mat-menu>
+      
+      <button mat-button routerLink="/stops" routerLinkActive="active-link">
+        <mat-icon>place</mat-icon>
+        <span>Stops</span>
+      </button>
+    </nav>
+    
+    <div class="user-section">
+      <button mat-icon-button routerLink="/mainItinerary" matTooltip="Switch to User View" class="switch-btn">
+        <mat-icon>swap_horiz</mat-icon>
+      </button>
+    </div>
+  </div>
+</mat-toolbar>

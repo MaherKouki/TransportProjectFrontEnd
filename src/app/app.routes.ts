@@ -26,42 +26,70 @@ import { UserItineraryBrowserrComponent } from './Components/user-itinerary-brow
 import { LiveBusTrackingComponent } from './Components/live-bus-tracking/live-bus-tracking.component';
 import { UpdateItineraryComponent } from './Components/update-itinerary/update-itinerary.component';
 
-export const routes: Routes = [
+// export const routes: Routes = [
 
-  { path: "", redirectTo: "/dashboard", pathMatch: "full" },
-  { path: "dashboard", component: DashboardComponent },
-  { path: "buses", component: BusListComponent },
-  { path: "stops", component: StopListComponent },
-  { path: "itineraries", component: ItineraryListComponent },
-  { path: "itinerary-form", component: ItineraryFormComponent },
-
-
-  { path: "itinerary-map", component: ItineraryMapComponent },
-
-  //{ path: "addStopsMap", component: AddStopsMapComponent },
-
-  { path: 'addStopsMap/:id', component: AddStopsMapComponent },
-
-  { path: 'routeDetails', component: RouteDetailsComponent },
-
-  { path: 'userItinerary', component: UserItineraryBrowserComponent },
-
-  { path: 'mainItinerary', component: UserItineraryBrowserrComponent },
+//   { path: "", redirectTo: "/dashboard", pathMatch: "full" },
+//   { path: "dashboard", component: DashboardComponent },
+//   { path: "buses", component: BusListComponent },
+//   { path: "stops", component: StopListComponent },
+//   { path: "itineraries", component: ItineraryListComponent },
+//   { path: "itinerary-form", component: ItineraryFormComponent },
 
 
+//   { path: "itinerary-map", component: ItineraryMapComponent },
+
+//   //{ path: "addStopsMap", component: AddStopsMapComponent },
+
+//   { path: 'addStopsMap/:id', component: AddStopsMapComponent },
+
+//   { path: 'routeDetails', component: RouteDetailsComponent },
+
+//   { path: 'userItinerary', component: UserItineraryBrowserComponent },
+
+//   { path: 'mainItinerary', component: UserItineraryBrowserrComponent },
 
 
-  { path: "bus-tracking", component: BusTrackingComponent },
-  { path: "nearest-stop", component: NearestStopComponent },
-  //{ path: "driver-tracking", component: DriverTrackingComponent },
 
-  { path: "trackBus", component: TrackingComponent },
+
+//   { path: "bus-tracking", component: BusTrackingComponent },
+//   { path: "nearest-stop", component: NearestStopComponent },
+//   //{ path: "driver-tracking", component: DriverTrackingComponent },
+
+//   { path: "trackBus", component: TrackingComponent },
 
   
+//   { path: 'liveTracking/:busId', component: LiveBusTrackingComponent },
+
+//   { path: 'update-itinerary/:id', component: UpdateItineraryComponent }
+
+
+
+// ];
+export const routes: Routes = [
+  // Default redirect to user main page
+  { path: '', redirectTo: '/mainItinerary', pathMatch: 'full' },
+  
+  // ========== ADMIN ROUTES ==========
+  { path: 'dashboard', component: DashboardComponent },
+  { path: 'buses', component: BusListComponent },
+  { path: 'stops', component: StopListComponent },
+  { path: 'itineraries', component: ItineraryListComponent },
+  { path: 'itinerary-form', component: ItineraryFormComponent },
+  { path: 'update-itinerary/:id', component: UpdateItineraryComponent },
+  { path: 'itinerary-map', component: ItineraryMapComponent },
+  { path: 'addStopsMap/:id', component: AddStopsMapComponent },
+  { path: 'bus-tracking', component: BusTrackingComponent },
+  { path: 'trackBus', component: TrackingComponent },
+  
+  // ========== USER ROUTES ==========
+  { path: 'mainItinerary', component: UserItineraryBrowserrComponent },
+  { path: 'userItinerary', component: UserItineraryBrowserComponent },
+  { path: 'nearest-stop', component: NearestStopComponent },
   { path: 'liveTracking/:busId', component: LiveBusTrackingComponent },
-
-  { path: 'update-itinerary/:id', component: UpdateItineraryComponent }
-
-
-
+  
+  // ========== SHARED ROUTES ==========
+  { path: 'routeDetails', component: RouteDetailsComponent },
+  
+  // Wildcard route - redirect to main user page
+  { path: '**', redirectTo: '/mainItinerary' }
 ];
