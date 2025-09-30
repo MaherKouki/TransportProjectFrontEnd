@@ -53,14 +53,14 @@ export const routes: Routes = [
 
   { path: "bus-tracking", component: BusTrackingComponent },
   { path: "nearest-stop", component: NearestStopComponent },
-  { path: "driver-tracking", component: DriverTrackingComponent },
+  //{ path: "driver-tracking", component: DriverTrackingComponent },
 
   { path: "trackBus", component: TrackingComponent },
 
   
   { path: 'liveTracking/:busId', component: LiveBusTrackingComponent },
 
-{ path: 'update-itinerary/:id', component: UpdateItineraryComponent }
+  { path: 'update-itinerary/:id', component: UpdateItineraryComponent }
 
 
 
