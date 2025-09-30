@@ -1,0 +1,92 @@
+.user-toolbar {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.toolbar-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-right: 24px;
+}
+
+.brand-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  color: white;
+}
+
+.brand-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+}
+
+.nav-links {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+}
+
+.nav-links button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: white;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.nav-links button mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.active-link {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.nav-links button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+  .nav-links button span {
+    display: none;
+  }
+  
+  .brand-name {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .toolbar-content {
+    padding: 0 8px;
+  }
+  
+  .nav-links {
+    gap: 4px;
+  }
+  
+  .brand-section {
+    margin-right: 12px;
+  }
+}
