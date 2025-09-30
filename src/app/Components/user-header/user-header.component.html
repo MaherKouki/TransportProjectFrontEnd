@@ -1,1 +1,25 @@
-<p>user-header works!</p>
+<mat-toolbar color="primary" class="user-toolbar">
+  <div class="toolbar-content">
+    <div class="brand-section">
+      <mat-icon class="brand-icon">directions_bus</mat-icon>
+      <span class="brand-name">Bus Finder</span>
+    </div>
+    
+    <nav class="nav-links">
+      <button mat-button routerLink="/mainItinerary" routerLinkActive="active-link">
+        <mat-icon>search</mat-icon>
+        <span>Find My Bus</span>
+      </button>
+      
+      <button mat-button routerLink="/nearest-stop" routerLinkActive="active-link">
+        <mat-icon>near_me</mat-icon>
+        <span>Nearest Stop</span>
+      </button>
+      
+      <button mat-button routerLink="/userItinerary" routerLinkActive="active-link">
+        <mat-icon>route</mat-icon>
+        <span>All Routes</span>
+      </button>
+    </nav>
+  </div>
+</mat-toolbar>

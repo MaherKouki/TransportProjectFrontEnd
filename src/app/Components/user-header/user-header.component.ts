@@ -1,11 +1,21 @@
 import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-user-header',
-  imports: [],
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatIconModule
+  ],
   templateUrl: './user-header.component.html',
-  styleUrl: './user-header.component.css'
+  styleUrls: ['./user-header.component.css']
 })
-export class UserHeaderComponent {
-
-}
+export class UserHeaderComponent {}
