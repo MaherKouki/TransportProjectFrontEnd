@@ -1,0 +1,78 @@
+<div class="register-container">
+  <mat-card class="register-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>person_add</mat-icon>
+        Create Account
+      </mat-card-title>
+      <p class="subtitle">Join our bus tracking system</p>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <form (ngSubmit)="onRegister()">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>First Name</mat-label>
+            <input matInput [(ngModel)]="userData.firstName" name="firstName">
+            <mat-icon matPrefix>badge</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Last Name</mat-label>
+            <input matInput [(ngModel)]="userData.lastName" name="lastName">
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Username *</mat-label>
+          <input matInput [(ngModel)]="userData.username" name="username" required>
+          <mat-icon matPrefix>person</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email *</mat-label>
+          <input matInput type="email" [(ngModel)]="userData.email" name="email" required>
+          <mat-icon matPrefix>email</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password *</mat-label>
+          <input 
+            matInput 
+            [type]="hidePassword ? 'password' : 'text'"
+            [(ngModel)]="userData.password" 
+            name="password" 
+            required>
+          <mat-icon matPrefix>lock</mat-icon>
+          <button 
+            mat-icon-button 
+            matSuffix 
+            type="button"
+            (click)="hidePassword = !hidePassword">
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Phone Number</mat-label>
+          <input matInput [(ngModel)]="userData.phoneNumber" name="phoneNumber">
+          <mat-icon matPrefix>phone</mat-icon>
+        </mat-form-field>
+
+        <button 
+          mat-raised-button 
+          color="primary" 
+          type="submit"
+          class="register-btn"
+          [disabled]="loading">
+          <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+          <span *ngIf="!loading">Register</span>
+        </button>
+      </form>
+
+      <div class="login-link">
+        <p>Already have an account? <a routerLink="/login">Sign in here</a></p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

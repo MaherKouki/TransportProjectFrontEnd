@@ -16,6 +16,7 @@ import { ItineraryService } from "../../service/ItineraryService/itinerary.servi
 import { MatSnackBar } from "@angular/material/snack-bar"
 import { Router } from "@angular/router"
 import { MatSlideToggleModule } from "@angular/material/slide-toggle"
+import { AdminHeaderComponent } from "../admin-header/admin-header.component";
 
 @Component({
   selector: "app-itinerary-form",
@@ -24,7 +25,7 @@ import { MatSlideToggleModule } from "@angular/material/slide-toggle"
     standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,       // ✅ needed for [formGroup], formControlName
+    ReactiveFormsModule, // ✅ needed for [formGroup], formControlName
     MatCardModule,
     MatTableModule,
     MatFormFieldModule,
@@ -34,8 +35,9 @@ import { MatSlideToggleModule } from "@angular/material/slide-toggle"
     MatProgressSpinnerModule,
     MatOption,
     FormsModule,
-    MatSlideToggleModule
-  ]
+    MatSlideToggleModule,
+    AdminHeaderComponent
+]
 })
 export class ItineraryFormComponent implements OnInit, AfterViewInit {
   itineraryForm: FormGroup

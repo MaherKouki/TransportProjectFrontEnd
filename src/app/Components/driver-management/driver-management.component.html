@@ -1,0 +1,127 @@
+<app-admin-header></app-admin-header>
+
+<div class="driver-management-container">
+  <div class="header-section">
+    <h2>🚗 Driver Account Management</h2>
+    <p class="subtitle">Create new driver accounts for the system</p>
+  </div>
+
+  <mat-card class="driver-form-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>person_add</mat-icon>
+        Create New Driver Account
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <form (ngSubmit)="onCreateDriver()">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>First Name</mat-label>
+            <input matInput [(ngModel)]="driverData.firstName" name="firstName">
+            <mat-icon matPrefix>badge</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Last Name</mat-label>
+            <input matInput [(ngModel)]="driverData.lastName" name="lastName">
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Username *</mat-label>
+          <input matInput [(ngModel)]="driverData.username" name="username" required>
+          <mat-icon matPrefix>person</mat-icon>
+          <mat-hint>Driver will use this to login</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email *</mat-label>
+          <input matInput type="email" [(ngModel)]="driverData.email" name="email" required>
+          <mat-icon matPrefix>email</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password *</mat-label>
+          <input 
+            matInput 
+            [type]="hidePassword ? 'password' : 'text'"
+            [(ngModel)]="driverData.password" 
+            name="password" 
+            required>
+          <mat-icon matPrefix>lock</mat-icon>
+          <button 
+            mat-icon-button 
+            matSuffix 
+            type="button"
+            (click)="hidePassword = !hidePassword">
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          <mat-hint>Minimum 6 characters recommended</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Phone Number</mat-label>
+          <input matInput [(ngModel)]="driverData.phoneNumber" name="phoneNumber">
+          <mat-icon matPrefix>phone</mat-icon>
+        </mat-form-field>
+
+        <div class="button-group">
+          <button 
+            mat-raised-button 
+            color="primary" 
+            type="submit"
+            class="create-btn"
+            [disabled]="loading">
+            <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+            <mat-icon *ngIf="!loading">add_circle</mat-icon>
+            <span *ngIf="!loading">Create Driver Account</span>
+            <span *ngIf="loading">Creating...</span>
+          </button>
+
+          <button 
+            mat-button 
+            type="button"
+            (click)="resetForm()"
+            [disabled]="loading">
+            <mat-icon>refresh</mat-icon>
+            Clear Form
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="info-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>info</mat-icon>
+        Important Information
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="info-section">
+        <h4>Driver Account Details:</h4>
+        <ul>
+          <li>Driver accounts are created with <strong>DRIVER</strong> role automatically</li>
+          <li>Drivers can only access the tracking system to send their bus positions</li>
+          <li>Drivers cannot access administrative functions</li>
+          <li>Username and email must be unique in the system</li>
+          <li>Make sure to provide the credentials to the driver securely</li>
+        </ul>
+      </div>
+
+      <div class="info-section">
+        <h4>Driver Capabilities:</h4>
+        <ul>
+          <li>✅ Send real-time bus position updates</li>
+          <li>✅ View bus and route information</li>
+          <li>❌ Cannot modify bus or route data</li>
+          <li>❌ Cannot access admin dashboard</li>
+        </ul>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,157 @@
+.driver-management-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+}
+
+.header-section {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.header-section h2 {
+  color: #1976d2;
+  margin: 0 0 8px 0;
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 16px;
+  margin: 0;
+}
+
+.driver-form-card {
+  margin-bottom: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+mat-card-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  margin: -16px -16px 16px -16px;
+  padding: 20px;
+  color: white;
+}
+
+mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+  margin: 0;
+}
+
+mat-card-title mat-icon {
+  color: white;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.half-width {
+  flex: 1;
+  margin-bottom: 16px;
+}
+
+.button-group {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.create-btn {
+  flex: 1;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.info-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border-left: 4px solid #ff9800;
+}
+
+.info-card mat-card-header {
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+}
+
+.info-section {
+  margin-bottom: 20px;
+}
+
+.info-section:last-child {
+  margin-bottom: 0;
+}
+
+.info-section h4 {
+  color: #333;
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.info-section ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #555;
+}
+
+.info-section li {
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .driver-management-container {
+    padding: 16px;
+  }
+  
+  .header-section h2 {
+    font-size: 26px;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .button-group {
+    flex-direction: column;
+  }
+  
+  mat-card-header {
+    padding: 16px;
+  }
+  
+  mat-card-title {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .driver-management-container {
+    padding: 12px;
+  }
+  
+  .header-section h2 {
+    font-size: 22px;
+  }
+  
+  .subtitle {
+    font-size: 14px;
+  }
+}

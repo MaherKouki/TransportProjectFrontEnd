@@ -650,6 +650,7 @@ import { ItineraryService } from "../../service/ItineraryService/itinerary.servi
 import { StopService } from "../../service/StopService/stop.service"
 import { BusPositionService } from "../../service/BusPositionService/bus-position.service"
 import * as L from 'leaflet'
+import { AdminHeaderComponent } from "../admin-header/admin-header.component";
 
 @Component({
   selector: "app-user-itinerary-browserr",
@@ -669,7 +670,8 @@ import * as L from 'leaflet'
     MatDialogModule,
     MatSnackBarModule,
     HttpClientModule,
-  ],
+    AdminHeaderComponent
+],
 })
 export class UserItineraryBrowserrComponent implements OnInit {
   // Search and UI state

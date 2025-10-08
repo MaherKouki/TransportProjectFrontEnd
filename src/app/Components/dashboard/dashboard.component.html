@@ -1,73 +1,188 @@
-<!-- <p>dashboard works!</p> -->
-
-
-
-
-
-
-
+<app-admin-header></app-admin-header>
 
 <div class="dashboard-container">
-  <h1>Dashboard</h1>
-  
-  <div class="stats-grid" *ngIf="!loading">
-    <mat-card class="stat-card">
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>directions_bus</mat-icon>
-          Total Buses
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="stat-number">{{totalBuses}}</div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="stat-card">
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>route</mat-icon>
-          Total Itineraries
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="stat-number">{{totalItineraries}}</div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="stat-card">
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>place</mat-icon>
-          Total Stops
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="stat-number">{{totalStops}}</div>
-      </mat-card-content>
-    </mat-card>
+  <!-- Header Section -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1>Admin Dashboard</h1>
+      <p class="subtitle">Welcome back! Here's your system overview</p>
+    </div>
+    <button mat-raised-button color="primary" routerLink="/itinerary-form" class="create-btn">
+      <mat-icon>add</mat-icon>
+      Create New Route
+    </button>
   </div>
 
+  <!-- Loading State -->
   <div class="loading-container" *ngIf="loading">
-    <mat-spinner></mat-spinner>
+    <mat-spinner diameter="50"></mat-spinner>
     <p>Loading dashboard data...</p>
   </div>
 
-  <div class="quick-actions" *ngIf="!loading">
-    <h2>Quick Actions</h2>
-    <div class="action-buttons">
-      <button mat-raised-button color="primary" routerLink="/buses">
-        <mat-icon>directions_bus</mat-icon>
-        Manage Buses
-      </button>
-      <button mat-raised-button color="accent" routerLink="/itinerary-form">
-        <mat-icon>add_location</mat-icon>
-        Create Itinerary
-      </button>
-      <button mat-raised-button color="warn" routerLink="/bus-tracking">
-        <mat-icon>gps_fixed</mat-icon>
-        Track Buses
-      </button>
+  <!-- Dashboard Content -->
+  <div class="dashboard-content" *ngIf="!loading">
+    
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+      <mat-card class="stat-card buses-card">
+        <div class="stat-icon">
+          <mat-icon>directions_bus</mat-icon>
+        </div>
+        <div class="stat-content">
+          <h3>Total Buses</h3>
+          <div class="stat-number">{{totalBuses}}</div>
+          <p class="stat-detail">
+            <span class="active-count">{{activeBuses}} active</span>
+          </p>
+        </div>
+        <button mat-icon-button class="card-action" routerLink="/buses">
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </mat-card>
+
+      <mat-card class="stat-card routes-card">
+        <div class="stat-icon">
+          <mat-icon>route</mat-icon>
+        </div>
+        <div class="stat-content">
+          <h3>Total Routes</h3>
+          <div class="stat-number">{{totalItineraries}}</div>
+          <p class="stat-detail">Active itineraries</p>
+        </div>
+        <button mat-icon-button class="card-action" routerLink="/itineraries">
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </mat-card>
+
+      <mat-card class="stat-card stops-card">
+        <div class="stat-icon">
+          <mat-icon>place</mat-icon>
+        </div>
+        <div class="stat-content">
+          <h3>Total Stops</h3>
+          <div class="stat-number">{{totalStops}}</div>
+          <p class="stat-detail">Unique locations</p>
+        </div>
+        <!-- <button mat-icon-button class="card-action" routerLink="/stops">
+          <mat-icon>arrow_forward</mat-icon>
+        </button> -->
+      </mat-card>
+
+      <mat-card class="stat-card tracking-card">
+        <div class="stat-icon">
+          <mat-icon>gps_fixed</mat-icon>
+        </div>
+        <div class="stat-content">
+          <h3>Live Tracking</h3>
+          <div class="stat-number">{{activeBuses}}</div>
+          <p class="stat-detail">Buses online</p>
+        </div>
+        <button mat-icon-button class="card-action" routerLink="/bus-tracking">
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </mat-card>
     </div>
+
+
+    
+    <!-- Quick Actions Section -->
+    <div class="quick-actions-section">
+      <h2>
+        <mat-icon>flash_on</mat-icon>
+        Quick Actions
+      </h2>
+      <div class="action-cards">
+        <mat-card class="action-card" routerLink="/buses">
+          <mat-icon color="primary">directions_bus</mat-icon>
+          <h3>Manage Buses</h3>
+          <p>View and manage all buses</p>
+        </mat-card>
+
+        <mat-card class="action-card" routerLink="/itinerary-form">
+          <mat-icon color="accent">add_location</mat-icon>
+          <h3>Create Route</h3>
+          <p>Add new itinerary</p>
+        </mat-card>
+
+        <mat-card class="action-card" routerLink="/stops">
+          <mat-icon color="warn">place</mat-icon>
+          <h3>Manage Stops</h3>
+          <p>View all bus stops</p>
+        </mat-card>
+
+        <mat-card class="action-card" routerLink="/bus-tracking">
+          <mat-icon style="color: #ff9800;">gps_fixed</mat-icon>
+          <h3>Track Buses</h3>
+          <p>Real-time tracking</p>
+        </mat-card>
+
+        <mat-card class="action-card" routerLink="/itinerary-map">
+          <mat-icon style="color: #9c27b0;">map</mat-icon>
+          <h3>Route Map</h3>
+          <p>View routes on map</p>
+        </mat-card>
+
+        <mat-card class="action-card" routerLink="/trackBus">
+          <mat-icon style="color: #00bcd4;">track_changes</mat-icon>
+          <h3>Live Tracking</h3>
+          <p>Track specific bus</p>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Recent Routes Section -->
+    <div class="recent-section" *ngIf="recentItineraries.length > 0">
+      <div class="section-header">
+        <h2>
+          <mat-icon>schedule</mat-icon>
+          Recent Routes
+        </h2>
+        <button mat-button color="primary" routerLink="/itineraries">
+          View All
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+      
+      <div class="recent-routes">
+        <mat-card class="route-card" *ngFor="let itinerary of recentItineraries">
+          <div class="route-header">
+            <div class="route-info">
+              <h3>{{ getItineraryDisplayName(itinerary) }}</h3>
+              <p class="route-meta" *ngIf="itinerary.startTime">
+                <mat-icon>schedule</mat-icon>
+                Starts: {{ itinerary.startTime }}
+              </p>
+            </div>
+            <button mat-icon-button (click)="navigateToRoute(itinerary.idItinerary)">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </div>
+          
+          <div class="route-details">
+            <div class="route-point">
+              <mat-icon>place</mat-icon>
+              <span>{{ getStopDisplayName(itinerary.departure) }}</span>
+            </div>
+            <mat-icon class="arrow">arrow_forward</mat-icon>
+            <div class="route-point">
+              <mat-icon>flag</mat-icon>
+              <span>{{ getStopDisplayName(itinerary.destination) }}</span>
+            </div>
+          </div>
+          
+          <div class="route-stats">
+            <span class="stat-badge">
+              <mat-icon>directions_bus</mat-icon>
+              {{ itinerary.buses?.length || 0 }} buses
+            </span>
+            <span class="stat-badge">
+              <mat-icon>location_on</mat-icon>
+              {{ itinerary.stops?.length || 0 }} stops
+            </span>
+          </div>
+        </mat-card>
+      </div>
+    </div>
+
   </div>
 </div>

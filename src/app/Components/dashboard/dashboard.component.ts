@@ -16,54 +16,49 @@
 
 
 
-
 import { Component, type OnInit } from "@angular/core"
+import { Router, RouterModule } from "@angular/router"
 import { BusService } from "../../service/BusService/bus.service"
 import { ItineraryService } from "../../service/ItineraryService/itinerary.service"
 import { Bus } from "../../entity/bus"
 import { Itinerary } from "../../entity/itinerary"
-import { CommonModule, NgFor, NgIf } from "@angular/common"
+import { CommonModule } from "@angular/common"
 import { FormsModule, ReactiveFormsModule } from "@angular/forms"
 import { MatCardModule } from "@angular/material/card"
-import { MatTableModule } from "@angular/material/table"
-import { MatFormFieldModule } from "@angular/material/form-field"
-import { MatInputModule } from "@angular/material/input"
 import { MatButtonModule } from "@angular/material/button"
 import { MatIconModule } from "@angular/material/icon"
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner"
-import { MatOption } from "@angular/material/autocomplete"
+import { AdminHeaderComponent } from "../admin-header/admin-header.component"
 
 @Component({
   selector: "app-dashboard",
   templateUrl: "./dashboard.component.html",
   styleUrls: ["./dashboard.component.css"],
-        standalone: true,
+  standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,       // ✅ needed for [formGroup], formControlName
+    ReactiveFormsModule,
+    FormsModule,
+    RouterModule,
     MatCardModule,
-    MatTableModule,
-    MatFormFieldModule,
-    MatInputModule,
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatOption,
-    FormsModule,
-        NgFor,
-    NgIf,
- 
+    AdminHeaderComponent
   ]
 })
 export class DashboardComponent implements OnInit {
   totalBuses = 0
   totalItineraries = 0
   totalStops = 0
+  activeBuses = 0
   loading = true
+  recentItineraries: Itinerary[] = []
 
   constructor(
     private busService: BusService,
     private itineraryService: ItineraryService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -72,24 +67,34 @@ export class DashboardComponent implements OnInit {
 
   loadDashboardData(): void {
     this.loading = true
+    let loadedItems = 0
+    const totalItems = 2
 
-    // Load buses count
+    // Load buses
     this.busService.getAllBuses().subscribe({
       next: (buses: Bus[]) => {
         this.totalBuses = buses.length
-        this.checkLoadingComplete()
+        // Simulate active buses (in real app, check bus status)
+        this.activeBuses = Math.floor(buses.length * 0.7)
+        loadedItems++
+        if (loadedItems === totalItems) this.loading = false
       },
       error: (error) => {
         console.error("Error loading buses:", error)
-        this.checkLoadingComplete()
-      },
+        loadedItems++
+        if (loadedItems === totalItems) this.loading = false
+      }
     })
 
-    // Load itineraries count
+    // Load itineraries
     this.itineraryService.getAllItineraries().subscribe({
       next: (itineraries: Itinerary[]) => {
         this.totalItineraries = itineraries.length
-        // Calculate total stops from all itineraries
+        
+        // Get recent itineraries (last 5)
+        this.recentItineraries = itineraries.slice(0, 5)
+        
+        // Calculate unique stops
         const allStops = new Set()
         itineraries.forEach((itinerary) => {
           if (itinerary.stops) {
@@ -97,19 +102,29 @@ export class DashboardComponent implements OnInit {
           }
         })
         this.totalStops = allStops.size
-        this.checkLoadingComplete()
+        
+        loadedItems++
+        if (loadedItems === totalItems) this.loading = false
       },
       error: (error) => {
         console.error("Error loading itineraries:", error)
-        this.checkLoadingComplete()
-      },
+        loadedItems++
+        if (loadedItems === totalItems) this.loading = false
+      }
     })
   }
 
-  private checkLoadingComplete(): void {
-    // Simple check - in a real app you'd want more sophisticated loading state management
-    setTimeout(() => {
-      this.loading = false
-    }, 500)
+  getItineraryDisplayName(itinerary: Itinerary): string {
+    return itinerary.itineraryName || `Route ${itinerary.idItinerary || 'Unknown'}`
+  }
+
+  getStopDisplayName(stop: any): string {
+    return stop?.stopName || 'Unknown'
+  }
+
+  navigateToRoute(itineraryId: number | undefined): void {
+    if (itineraryId) {
+      this.router.navigate(['/update-itinerary', itineraryId])
+    }
   }
 }

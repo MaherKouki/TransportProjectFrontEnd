@@ -1,0 +1,184 @@
+<p>tracking works!</p>
+
+<div class="tracking-container">
+  <div class="header-section">
+    <h2>🚌 Driver Tracking System</h2>
+    <p class="subtitle">Tracking fixed bus ID: 2</p>
+  </div>
+
+  <!-- Bus Info Card -->
+  <mat-card class="selection-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>directions_bus</mat-icon>
+        Bus Information
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="selected-bus-info">
+        <mat-icon>check_circle</mat-icon>
+        <span>Tracking Bus ID: {{ selectedBusId }}</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Tracking Controls Card -->
+  <mat-card class="controls-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>gps_fixed</mat-icon>
+        Tracking Controls
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="control-buttons">
+        <button 
+          mat-raised-button 
+          color="primary"
+          class="start-btn"
+          [disabled]="!canStartTracking()"
+          (click)="startTracking()">
+          <mat-icon>play_arrow</mat-icon>
+          Start Tracking
+        </button>
+        
+        <button 
+          mat-raised-button 
+          color="warn"
+          class="stop-btn"
+          [disabled]="!isTracking"
+          (click)="stopTracking()">
+          <mat-icon>stop</mat-icon>
+          Stop Tracking
+        </button>
+      </div>
+
+      <div class="tracking-status" *ngIf="isTracking">
+        <div class="status-badge active">
+          <mat-icon class="pulse">fiber_manual_record</mat-icon>
+          <span>Tracking Active</span>
+        </div>
+      </div>
+
+      <div class="tracking-status" *ngIf="!isTracking">
+        <div class="status-badge inactive">
+          <mat-icon>radio_button_unchecked</mat-icon>
+          <span>Tracking Inactive</span>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Current Position Card -->
+  <mat-card class="position-card" *ngIf="isTracking || currentPosition">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>my_location</mat-icon>
+        Current Position
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="position-info" *ngIf="currentPosition">
+        <div class="position-item">
+          <mat-icon>place</mat-icon>
+          <div class="position-details">
+            <span class="label">Latitude:</span>
+            <span class="value">{{ currentPosition.lat | number:'1.6-6' }}</span>
+          </div>
+        </div>
+        
+        <div class="position-item">
+          <mat-icon>place</mat-icon>
+          <div class="position-details">
+            <span class="label">Longitude:</span>
+            <span class="value">{{ currentPosition.lon | number:'1.6-6' }}</span>
+          </div>
+        </div>
+        
+        <div class="position-item" *ngIf="lastUpdateTime">
+          <mat-icon>schedule</mat-icon>
+          <div class="position-details">
+            <span class="label">Last Update:</span>
+            <span class="value">{{ lastUpdateTime | date:'medium' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="no-position" *ngIf="!currentPosition">
+        <mat-icon>location_off</mat-icon>
+        <p>Waiting for location data...</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Statistics Card -->
+  <mat-card class="stats-card" *ngIf="isTracking">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>analytics</mat-icon>
+        Session Statistics
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <mat-icon>send</mat-icon>
+          <div class="stat-info">
+            <span class="stat-value">{{ positionsSent }}</span>
+            <span class="stat-label">Positions Sent</span>
+          </div>
+        </div>
+        
+        <div class="stat-item">
+          <mat-icon>directions_bus</mat-icon>
+          <div class="stat-info">
+            <span class="stat-value">{{ selectedBusId }}</span>
+            <span class="stat-label">Bus ID</span>
+          </div>
+        </div>
+        
+        <div class="stat-item">
+          <mat-icon>update</mat-icon>
+          <div class="stat-info">
+            <span class="stat-value">4s</span>
+            <span class="stat-label">Update Interval</span>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Error Message -->
+  <div class="error-message" *ngIf="errorMessage">
+    <mat-icon>error</mat-icon>
+    <div class="error-content">
+      <strong>Error:</strong>
+      <p>{{ errorMessage }}</p>
+    </div>
+  </div>
+
+  <!-- Instructions Card -->
+  <mat-card class="instructions-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>info</mat-icon>
+        Instructions
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <ol class="instructions-list">
+        <li>Tracking is automatically set to bus ID <strong>2</strong>.</li>
+        <li>Click "Start Tracking" to begin sending your location.</li>
+        <li>Your position will be sent every 4 seconds automatically.</li>
+        <li>Keep this page open while driving.</li>
+        <li>Click "Stop Tracking" when you finish your route.</li>
+        <li>Make sure location permissions are enabled in your browser.</li>
+      </ol>
+    </mat-card-content>
+  </mat-card>
+</div>
